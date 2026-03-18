@@ -1,0 +1,14 @@
+# Treat Excel and Word files as binary — prevents garbled merge diffs
+*.xlsx binary
+*.xlsm binary
+*.xls  binary
+*.docx binary
+*.pptx binary
+*.pdf  binary
+
+# Normalize line endings for text files
+*.md   text eol=lf
+*.json text eol=lf
+*.py   text eol=lf
+*.txt  text eol=lf
+*.csv  text eol=lf
