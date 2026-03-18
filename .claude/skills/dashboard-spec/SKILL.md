@@ -5,7 +5,9 @@ allowed-tools: Read, Glob
 ---
 
 Generate a Tableau dashboard specification for the NFL Stadium Technology Scorecard.
-Reference `reference/NFL_Scorecard_Methodology_v1.2.md` for scoring formulas and `reference/nfl_voice_of_the_fan_research.md` for outcome correlation data.
+Reference `reference/nfl_voice_of_the_fan_research.md` for outcome correlation data and `reference/nfl_stadium_tech_revenue_research.md` for business benchmarks.
+
+**Important:** Scoring methodology has not been finalized. Do not apply or hardcode scoring formulas, dimension weights, or maturity tier thresholds. Where calculations are needed, use clearly labeled placeholders and note "scoring formula TBD — pending `/scoring-design` output." Dashboard structure, data model, and views can be fully specified now.
 
 $ARGUMENTS
 
@@ -23,39 +25,17 @@ $ARGUMENTS
 
 **Input data shape:** Scored survey responses — rows = clubs × questions (51), columns = metadata + raw score + adjusted score + confidence factor
 
-**Required calculated fields (Tableau) — PROTOTYPE, not finalized:**
+**Calculated fields — structure only (formulas TBD):**
 
 ```
-// Adjusted Score (apply confidence if available)
-AdjustedScore = IF [ConfidenceFactor] != NULL
-  THEN [RawScore] × [ConfidenceFactor]
-  ELSE [RawScore]
-END
+// These are structural placeholders. Actual formulas depend on scoring methodology
+// output from /scoring-design. Do not hardcode weights or thresholds.
 
-// Layer Score (E/C/P/G weighted; O excluded) — weights prototype
-LayerScore =
-  (0.25 × AVG(IF [Dimension]="E" THEN [AdjustedScore] END)) +
-  (0.25 × AVG(IF [Dimension]="C" THEN [AdjustedScore] END)) +
-  (0.30 × AVG(IF [Dimension]="P" THEN [AdjustedScore] END)) +
-  (0.20 × AVG(IF [Dimension]="G" THEN [AdjustedScore] END))
-
-// Normalized to 0–100
-NormalizedLayerScore = [LayerScore] / 10 × 100
-
-// Game Phase Score — prototype
-PhaseScore = SUM([AdjustedScore] × [PhaseWeight] × [PhaseApplicability])
-             / SUM([MaxPossible]) × 10
-
-// Benchmark gap (vs. pilot average)
-BenchmarkGap = [NormalizedLayerScore] − WINDOW_AVG([NormalizedLayerScore])
-
-// Maturity Tier (for color coding)
-MaturityTier =
-  IF [NormalizedLayerScore] < 40 THEN "Emerging"
-  ELSEIF [NormalizedLayerScore] < 60 THEN "Developing"
-  ELSEIF [NormalizedLayerScore] < 80 THEN "Advanced"
-  ELSE "Leading"
-END
+AdjustedScore         = [TBD — depends on confidence weighting decision]
+LayerScore            = [TBD — depends on dimension weights from /scoring-design]
+NormalizedLayerScore  = [TBD — depends on score scale (e.g., 0–10 or 0–100)]
+BenchmarkGap          = [NormalizedLayerScore] − WINDOW_AVG([NormalizedLayerScore])
+MaturityTier          = [TBD — thresholds to be set in /scoring-design]
 ```
 
 ## Required Dashboard Views

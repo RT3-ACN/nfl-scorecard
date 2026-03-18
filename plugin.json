@@ -6,6 +6,7 @@
   "skills": [
     ".claude/skills/survey-review",
     ".claude/skills/question-draft",
+    ".claude/skills/scoring-design",
     ".claude/skills/dashboard-spec",
     ".claude/skills/scorecard-report"
   ],

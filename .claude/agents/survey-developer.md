@@ -33,7 +33,6 @@ The current phase of work is **question development**. Scoring methodology, weig
 2. `working/survey/WIP_NFL_Survey_v0.xlsx` → sheet **"Combined Survey Questions"** — 103-question combined view (Claude V0 + colleague's V1)
 3. `reference/nfl_full-reference.md` — full question reference and MECE sub-category map; use to check for overlap
 4. `working/survey/NFL_Survey_Question_Review.md` — known issues and fix backlog; check before drafting in affected areas
-5. `archive/nfl_master-csv.txt` (legacy) — legacy reference only; superseded by WIP_NFL_Survey_v0.xlsx
 
 ## Question Schema (always output in this exact format)
 Every question must have all 9 fields:

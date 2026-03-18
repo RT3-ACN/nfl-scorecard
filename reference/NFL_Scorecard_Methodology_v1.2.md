@@ -1,7 +1,10 @@
 ---
 tags: [project, work, client/nfl, reference]
 date: 2025-02
+status: PITCH-ERA PROTOTYPE — not the active Phase 2 methodology
 ---
+
+> **Note:** This document was developed to support the Phase 1 pitch and SOW. It is retained as a reference starting point only. Phase 2 scoring methodology is being built from scratch using the finalized question set and the `/scoring-design` skill. Do not apply these formulas or weights as settled methodology.
 
 # NFL Technology & Fan Experience Scorecard  
 ## Survey & Scoring Methodology (v1.2 – Team Share)

@@ -38,17 +38,24 @@ Fixed fee $100K. **Client lead:** Gary Brantley (NFL SVP & CIO) | **Accenture le
 - Non-response options (both score 0): `"Data not available / unknown"` | `"We don't use this technology today"`
 - No open-text questions — all drop-down or select-all, minimum 5 options
 
-## Scoring Templates (T1–T5 + O — prototype, not finalized)
+## Scoring Status
+
+**Scoring methodology has NOT been designed for Phase 2.** The pitch-era prototype (`reference/NFL_Scorecard_Methodology_v1.2.md`) is retained as background only — do not apply its formulas or weights.
+
+Use `/scoring-design` to build the methodology from the question set. Until that work is complete and confirmed by Jon Wakefield:
+- Do not score any questions or clubs
+- Do not present any weighting as agreed
+- Dashboard specs can be structured but must leave all formulas as TBD placeholders
+
+**Scoring template types** (conceptual reference — assignment per question is part of `/scoring-design`):
 | Template | Use Case |
 |----------|----------|
-| T1 | Maturity ladder: existence/deployment stages (1=None → 10=Optimized) |
-| T2 | Coverage %: reach across venue |
+| T1 | Maturity ladder: staged capability adoption |
+| T2 | Coverage/reach: % of venue or fan base covered |
 | T3 | Lower-is-better: latency, wait times, error rates |
 | T4 | Higher-is-better: adoption, throughput, uptime |
 | T5 | Governance: controls, audits, monitoring |
-| O  | Outcomes: whether measured and drives decisions |
-
-**Scoring weights, roll-up formulas, and game phase weighting are PROTOTYPE. Never present as finalized.**
+| O  | Outcomes: whether performance is measured and drives decisions |
 
 ## Question Schema — 9 required fields (every question, every time)
 `Survey Category | Question ID | Domain Covered | Question | Guide Explanation | Answer Format | Survey Answer Options Style | Survey Answer Options Definitions | Answer Guide`
@@ -76,8 +83,9 @@ Fixed fee $100K. **Client lead:** Gary Brantley (NFL SVP & CIO) | **Accenture le
 **Skills (slash commands):**
 - `/survey-review` — quality check any questions for bias, clarity, MECE compliance
 - `/question-draft [layer] [topic]` — draft new questions in correct 9-field schema
-- `/dashboard-spec [view name]` — generate Tableau dashboard specification
-- `/scorecard-report [club name]` — generate club maturity assessment report
+- `/scoring-design` — build the scoring methodology from the question set (do this before dashboard or report work)
+- `/dashboard-spec [view name]` — generate Tableau dashboard specification (structure only until scoring is finalized)
+- `/scorecard-report [club name]` — generate club maturity report (requires scored data)
 
 **Agents:**
 - `survey-developer` — question methodology, drafting, schema compliance

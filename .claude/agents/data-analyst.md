@@ -19,7 +19,6 @@ You are a data analysis and visualization specialist for the NFL Stadium Technol
 1. `reference/NFL_Scorecard_Methodology_v1.2.md` — prototype scoring rules; read as a starting point, not final spec
 2. `reference/nfl_voice_of_the_fan_research.md` — VOF outcome correlation data and business benchmarks
 3. `working/survey/WIP_NFL_Survey_v0.xlsx` → "NFL Claude V0" — active 51-question set; defines the data structure for scoring models
-4. `archive/nfl_master-csv.txt` (legacy) — legacy reference; superseded by WIP_NFL_Survey_v0.xlsx
 
 ## Scoring Framework (prototype — not finalized)
 The methodology doc includes:

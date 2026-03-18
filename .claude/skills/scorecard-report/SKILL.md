@@ -6,10 +6,13 @@ allowed-tools: Read, Glob, Grep
 
 Generate a maturity assessment report for NFL club: $ARGUMENTS
 
+**Prerequisites:** This skill requires scored survey data and a finalized scoring methodology. If scoring is not yet complete, use `/scoring-design` first to build the methodology, then return here once club responses have been scored.
+
 Reference files (read before generating):
-- `reference/NFL_Scorecard_Methodology_v1.2.md` — scoring formulas, maturity tier thresholds
 - `reference/nfl_voice_of_the_fan_research.md` — VOF benchmarks, tech-to-revenue correlations
-- `reference/NFL_Technology_Areas_Definitions.md` — area scope definitions
+- `reference/nfl_stadium_tech_revenue_research.md` — business benchmarks and revenue context
+- `reference/NFL_Technology_Areas_Definitions.md` — layer scope definitions
+- `working/survey/NFL_Survey_Question_Review.md` — scoring methodology decisions (once captured)
 
 ## Report Structure
 
