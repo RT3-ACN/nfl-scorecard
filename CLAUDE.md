@@ -7,13 +7,13 @@ Fixed fee $100K. **Client lead:** Gary Brantley (NFL SVP & CIO) | **Accenture le
 | Path | What lives here |
 |------|-----------------|
 | `working/survey/` | Active survey files — WIP_NFL_Survey_v0.xlsx, question backlog |
-| `working/scoring/` | Scoring workbook — NFL_Scorecard_Master_Combined_v1.2.xlsx |
 | `reference/` | Stable reference docs — read them, don't edit them mid-task |
 | `.claude/` | Agents, skills, rules — the Claude Code tooling for this project |
 | `scripts/` | Python automation (openpyxl, recalc) |
+| `deliverables/` | Client-facing outputs (docs, decks) |
 | `archive/` | Superseded files — legacy only |
 
-**NEVER modify `*_v1.2.xlsx` files directly. Script changes via Python/openpyxl and version-bump the filename.**
+**The only active working file is `working/survey/WIP_NFL_Survey_v0.xlsx`. All other Excel workbooks are retired.**
 
 ## Framework — v2 (locked 2026-03-18)
 

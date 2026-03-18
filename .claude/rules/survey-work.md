@@ -9,7 +9,7 @@ You are working on **NFL survey content** — questions, scoring, backlog, or de
 - **Primary survey:** `working/survey/WIP_NFL_Survey_v0.xlsx` → sheet "NFL Claude V0" (51 questions)
 - **Combined view:** same file → sheet "Combined Survey Questions" (103 questions, V0 + V1)
 - **Backlog:** `working/survey/NFL_Survey_Question_Review.md`
-- **Scoring workbook:** `working/scoring/NFL_Scorecard_Master_Combined_v1.2.xlsx` — do NOT modify directly
+- **Scoring methodology:** `reference/NFL_Scorecard_Methodology_v1.2.md` — scoring workbook is not in repo
 
 ## Before working on questions
 

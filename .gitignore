@@ -13,26 +13,21 @@ venv/
 *.pdf
 Infrastructure_Insight_Matrix_Guide*.html
 
-# Root-level duplicates — canonical versions live in working/ or reference/
-# These stay in root for OneDrive backwards compatibility but aren't tracked in git
+# Root-level duplicates and non-repo files
 /WIP_NFL_Survey_v0.xlsx
 /NFL_Survey_Question_Review.md
 /NFL_Scorecard_Methodology_v1.2.md
 /NFL_Technology_Areas_Definitions.md
-/NFL_Scorecard_Master_Combined_v1.2.xlsx
 /NFL_Scorecard_Questions_Review.md
 /build_100_questions.py
 /nfl_master-csv.txt
 /nfl_full-reference.md
 /nfl_voice_of_the_fan_research.md
 /Brandskill_arch.md
-/Infrastructure_Insight_Matrix_Full.xlsx
 
-# Old versioned files (archives)
-NFL_Fan*
-NFL_Tech_Survey_Framework_Master.xlsx
-NFL_Scorecard_Master_Combined_v1.1.xlsx
-NFL_Scorecard_Master_Combined_v1.xlsx
+# All Excel files except the active survey — only WIP_NFL_Survey_v0.xlsx belongs in the repo
+*.xlsx
+!working/survey/WIP_NFL_Survey_v0.xlsx
 
 # Personal notes and local overrides
 CLAUDE.local.md

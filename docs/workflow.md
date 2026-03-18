@@ -154,24 +154,6 @@ If you're not sure what changes are in the pushed version, read it first before 
 
 ---
 
-## Never Modify Source-of-Truth Workbooks Directly
-
-`working/scoring/NFL_Scorecard_Master_Combined_v1.2.xlsx` is the scoring source of truth.
-
-**Rule:** Always generate a new version with a bumped filename. Never save over v1.2.
-
-If you need to modify it:
-1. Ask the data-analyst agent to write an openpyxl script
-2. The script reads v1.2, makes changes, and saves as `_v1.3.xlsx`
-3. Commit the new version, archive the old one
-
-```bash
-python3 scripts/update_scoring.py   # generates _v1.3.xlsx
-git add working/scoring/NFL_Scorecard_Master_Combined_v1.3.xlsx
-git mv working/scoring/NFL_Scorecard_Master_Combined_v1.2.xlsx archive/
-git commit -m "scoring: bumped to v1.3 — added DI layer weight prototype update"
-```
-
 ---
 
 ## PR Review Guidelines

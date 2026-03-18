@@ -91,7 +91,6 @@ Read [docs/framework.md](framework.md) for the full reference including answer f
 | Active survey (51 questions) | `working/survey/WIP_NFL_Survey_v0.xlsx` → "NFL Claude V0" |
 | Both surveys side by side | same file → "Combined Survey Questions" |
 | Known issues + open decisions | `working/survey/NFL_Survey_Question_Review.md` |
-| Scoring workbook | `working/scoring/NFL_Scorecard_Master_Combined_v1.2.xlsx` |
 | Layer scope definitions | `reference/NFL_Technology_Areas_Definitions.md` |
 | Scoring methodology | `reference/NFL_Scorecard_Methodology_v1.2.md` |
 | VOF research + benchmarks | `reference/nfl_voice_of_the_fan_research.md` |

@@ -76,8 +76,7 @@ nfl-scorecard/
 │   └── rules/                    ← Conditional context (plugin-dev, survey-work)
 │
 ├── working/
-│   ├── survey/                   ← WIP_NFL_Survey_v0.xlsx + NFL_Survey_Question_Review.md
-│   └── scoring/                  ← NFL_Scorecard_Master_Combined_v1.2.xlsx
+│   └── survey/                   ← WIP_NFL_Survey_v0.xlsx + NFL_Survey_Question_Review.md
 │
 ├── reference/                    ← Stable docs (methodology, definitions, VOF research)
 ├── deliverables/                 ← Client-facing outputs (Phase 2 draft, walkaround deck)
@@ -92,7 +91,7 @@ nfl-scorecard/
 | Deliverable | Status | File |
 |-------------|--------|------|
 | Survey instrument (C) | 🔄 In development | `working/survey/WIP_NFL_Survey_v0.xlsx` |
-| Scoring framework (B) | ✅ v1.2 prototype | `working/scoring/NFL_Scorecard_Master_Combined_v1.2.xlsx` |
+| Scoring framework (B) | ✅ v1.2 prototype | `reference/NFL_Scorecard_Methodology_v1.2.md` |
 | Tableau dashboard (D) | ⏸ Blocked on scoring | — |
 | Phase 2 draft | 🔄 In progress | `deliverables/` |
 
@@ -123,7 +122,7 @@ nfl-scorecard/
 
 ## The 5 Rules That Matter Most
 
-1. **Never modify `*_v1.2.xlsx` directly** — script changes via Python/openpyxl
+1. **`WIP_NFL_Survey_v0.xlsx` is the only working Excel in the repo** — all other workbooks are retired
 2. **Physical endpoints (kiosks, displays, cameras, POS hardware) → `DI_`**, not `TI_`
 3. **`TI_` = connectivity only** (Wi-Fi, DAS, 5G, cabling, uplink)
 4. **Absolute counts are not comparable** across 32 clubs — normalize per 10K seats

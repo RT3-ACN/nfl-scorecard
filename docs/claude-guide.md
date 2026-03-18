@@ -11,7 +11,7 @@ Claude: when loaded as context, use this to understand how you should behave on 
 When opened from the repo root, Claude automatically loads `CLAUDE.md` and knows:
 
 - The v2 4-layer framework (TI/DI/TS/AI prefixes, layer scope rules, v2 decisions)
-- Active file locations (`working/survey/`, `working/scoring/`, `reference/`)
+- Active file location: `working/survey/WIP_NFL_Survey_v0.xlsx` (the only working Excel in the repo)
 - Question quality rules (normalization, non-response handling, concessionaire scenario)
 - The 3 known critical issues (DI_03, DI_05, TS_01)
 - Open decisions the team hasn't finalized
@@ -139,7 +139,7 @@ These are hard rules. If Claude does any of these, stop it and correct the behav
 
 | Don't | Why |
 |-------|-----|
-| Modify `*_v1.2.xlsx` files directly | Source of truth — changes must be scripted via openpyxl with version bump |
+| Reference any Excel file other than `WIP_NFL_Survey_v0.xlsx` | It is the only working file in the repo — all others are retired |
 | Use `ID_` layer prefix | Old framework — v2 uses `TI_` |
 | Reference 5 technology areas or "Digital Services" as a layer | Old model — v2 has 4 layers: TI/DI/TS/AI |
 | Put kiosks, displays, cameras in `TI_` | Physical endpoints belong in `DI_` |
