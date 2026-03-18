@@ -7,6 +7,29 @@ status: active
 
 # NFL Scorecard Survey — Question Review Notes
 
+## Session Log
+
+### 2026-03-18 — Repo + Plugin Build Session
+
+**Completed:**
+- Built private GitHub repo at `RT3-ACN/nfl-scorecard` — full team collaboration infrastructure
+- Created complete directory structure (`working/survey/`, `reference/`, `docs/`, `deliverables/`, `archive/`)
+- Audited and updated all 3 agents (survey-developer, data-analyst, knowledge-manager) to v2 framework
+- Audited and updated all 4 skills (survey-review, question-draft, dashboard-spec, scorecard-report)
+- Created new `/scoring-design` skill — the critical path tool for building scoring methodology from questions
+- Created 6 documentation files (`docs/onboarding.md`, `docs/claude-guide.md`, `docs/framework.md`, `docs/skills-reference.md`, `docs/agents-reference.md`, `docs/workflow.md`)
+- Created `CLAUDE.md` (single source of truth), `CONTRIBUTING.md`, `README.md`, `plugin.json`, `.gitignore`, `.gitattributes`
+- Removed all Excel workbooks from repo except `WIP_NFL_Survey_v0.xlsx` — all others retired
+- Removed 10+ stale root-level files, cleaned archive
+- Reframed scoring: `NFL_Scorecard_Methodology_v1.2.md` labeled as pitch-era prototype; Phase 2 scoring to be built from scratch via `/scoring-design`
+
+**Key decision recorded:**
+- Scoring methodology is NOT being carried forward from pitch. Phase 2 scoring will be designed from the finalized question set using `/scoring-design`. Do not apply v1.2 weights or formulas.
+
+**Still open (survey issues — unchanged):** DI_03, DI_05 (now renamed from ID_03/ID_05), TS_01
+
+---
+
 ## Active Question Set (as of 2026-03-18)
 
 **File:** `WIP_NFL_Survey.xlsx` → sheet **"NFL Claude V0"**
