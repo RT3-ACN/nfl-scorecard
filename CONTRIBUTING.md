@@ -1,10 +1,49 @@
 # Contributing to the NFL Scorecard Plugin
 
-This document is for all three team members. It covers two things:
+This document is for all team members. It covers two things:
 1. **How we work together** — git workflow, file ownership, communication
 2. **How to develop Claude tooling** — quality standards for skills, agents, and CLAUDE.md
 
 Claude reads this file too. When someone asks Claude to help improve a skill or agent, Claude should follow these standards.
+
+---
+
+## Getting Started (New Teammate — One-Time Setup)
+
+**Requirements:** Git, Python 3, Claude Code
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/RT3-ACN/nfl-scorecard.git
+cd nfl-scorecard
+
+# 2. Open Claude Code — all skills, agents, and rules load automatically
+claude
+```
+
+That's it. You now have the same Claude setup as everyone else — all skills (`/survey-review`, `/scoring-design`, etc.), agents, and project context are committed to the repo and load automatically on launch.
+
+---
+
+## Daily Workflow (Everyone, Every Session)
+
+**Before you do anything:**
+```bash
+git pull origin main
+```
+Always pull first. Gets you the latest skills, rules, and working files before you start.
+
+**Before editing any `.xlsx` file:**
+> Send a quick message to the team (Teams/Slack): **"Taking [filename]"**
+
+Git cannot merge binary files. If two people edit the same Excel at the same time, one version gets overwritten. The message takes 5 seconds and prevents it entirely.
+
+**End of session:**
+```bash
+git add .
+git commit -m "survey: [what you did]"
+git push origin main   # or your branch — see below
+```
 
 ---
 

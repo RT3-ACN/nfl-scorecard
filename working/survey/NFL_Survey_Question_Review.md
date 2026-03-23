@@ -9,6 +9,30 @@ status: active
 
 ## Session Log
 
+### 2026-03-18 — Vik Arya Survey Review Session
+
+**Attendees:** Vik Arya, Robert Treiber III, Kieran McConnell
+
+**Methodology decisions confirmed (Vik-directed):**
+- Answer options must reflect realistic stadium scale — calibrate ranges to actual NFL venue requirements (Vik: 200 APs is "ridiculously low")
+- Remove any question answerable from public data (e.g., seating capacity); don't waste respondent time
+- Reframe Wi-Fi questions around consistent fan UX + traffic prioritization (video, social media, POS) — not upload speed alone
+- No vendor names — ask about standardization and strategic fit, not brand inventories
+- Every question must set a clear minimum technical floor — avoid generic or mundane answer options
+- Add layman explanations in guide text for less tech-forward clubs
+- Cybersecurity questions must contextualize why they matter (fan experience, compliance, innovation)
+- Keep survey anchored on technology, not governance/process
+- Do not quote individuals or external sources in question text
+
+**Action items:**
+- Robert: Apply above quality rules to all open TI + DI questions (esp. TI Wi-Fi density, DI cybersecurity questions)
+- Vik: Review updated survey offline and provide further feedback
+- Kieran: Continue supporting question refinement
+
+**Future consideration (v2/roadmap):** Edge AI/LLM deployment questions for Innovation tier
+
+---
+
 ### 2026-03-18 — Repo + Plugin Build Session
 
 **Completed:**
