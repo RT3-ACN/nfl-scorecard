@@ -1,0 +1,67 @@
+name: Validate
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          required=(
+            "CLAUDE.md"
+            "CONTRIBUTING.md"
+            "TEAM_GUIDE.md"
+            "working/survey/WIP_NFL_Survey_v0.xlsx"
+          )
+          failed=0
+          for f in "${required[@]}"; do
+            if [[ ! -f "$f" ]]; then
+              echo "❌ Required file missing: $f"
+              failed=1
+            else
+              echo "✅ $f"
+            fi
+          done
+          exit $failed
+
+      - name: Validate JSON files
+        run: |
+          find . -name "*.json" \
+            -not -path "./node_modules/*" \
+            -not -path "./.git/*" | while read f; do
+            python3 -m json.tool "$f" > /dev/null 2>&1 \
+              && echo "✅ $f" \
+              || { echo "❌ Invalid JSON: $f"; exit 1; }
+          done
+
+      - name: Check .gitignore blocks secrets
+        run: |
+          blocked=(".env" "*.local.md" "CLAUDE.local.md")
+          for pattern in "${blocked[@]}"; do
+            if grep -qF "$pattern" .gitignore; then
+              echo "✅ .gitignore blocks: $pattern"
+            else
+              echo "❌ .gitignore missing: $pattern"
+              exit 1
+            fi
+          done
+
+      - name: No Excel files except active survey
+        run: |
+          xlsx_files=$(find . -name "*.xlsx" \
+            -not -path "./.git/*" \
+            -not -path "./working/survey/WIP_NFL_Survey_v0.xlsx")
+          if [[ -n "$xlsx_files" ]]; then
+            echo "❌ Unexpected .xlsx files found (only WIP_NFL_Survey_v0.xlsx allowed):"
+            echo "$xlsx_files"
+            exit 1
+          else
+            echo "✅ Only active survey workbook present"
+          fi

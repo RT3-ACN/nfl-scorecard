@@ -17,7 +17,10 @@ Claude reads this file too. When someone asks Claude to help improve a skill or 
 git clone https://github.com/RT3-ACN/nfl-scorecard.git
 cd nfl-scorecard
 
-# 2. Open Claude Code — all skills, agents, and rules load automatically
+# 2. Install the pre-push hook (blocks accidental pushes to main)
+git config core.hooksPath .githooks
+
+# 3. Open Claude Code — all skills, agents, and rules load automatically
 claude
 ```
 
