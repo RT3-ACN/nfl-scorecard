@@ -6,14 +6,24 @@
  * language observed in NFL Walkaround_v2.pptx and Scorecard_walkaround_proposal.pptx.
  *
  * Usage:
- *   node generate_pptx_nfl.js --input outputs/walkaround.md --type walkaround
- *   node generate_pptx_nfl.js --demo  (generates a sample deck showing all slide types)
+ *   node generate_pptx_nfl.js --demo
+ *   node generate_pptx_nfl.js --input deck.md
+ *   node generate_pptx_nfl.js --demo --fetch-bg "nfl stadium aerial"
+ *   node generate_pptx_nfl.js --demo --generate-bg "aerial view of NFL stadium at night"
+ *   node generate_pptx_nfl.js --demo --bg /path/to/local/image.jpg
  *
- * Colors verified from theme1.xml (NFL Walkaround_v2.pptx, 2026-03-25)
- * + real deck fill/text color analysis.
+ * Background image modes (cover slide):
+ *   --fetch-bg <query>     Pull a real photo from Unsplash/Pexels (needs API key)
+ *   --generate-bg <prompt> AI-generate via DALL-E 3 or Replicate/Flux (needs API key)
+ *   --bg <path>            Use a local image file
+ *   --hd                   Use DALL-E 3 HD quality (default: standard)
+ *
+ * Required env vars (set whichever you have):
+ *   UNSPLASH_ACCESS_KEY, PEXELS_API_KEY, OPENAI_API_KEY, REPLICATE_API_TOKEN
  */
 
 const PptxGenJS = require("pptxgenjs");
+const { getBackgroundImage } = require("./image-utils");
 const fs = require("fs");
 const path = require("path");
 
@@ -130,33 +140,48 @@ function addSectionChip(slide, label, x, y) {
 
 // ─── Slide Type 1: Cover ──────────────────────────────────────────────────────
 /**
- * NFL cover slide — dark navy gradient background, NFL + Accenture co-branding.
- * In production: replace background shape with stadium photo image.
+ * NFL cover slide — uses a background photo when available, solid navy fallback.
  *
  * @param {Object} pptx
- * @param {string} title      e.g. "NFL Scorecard Overview"
- * @param {string} subtitle   e.g. "Phase 2 — Stadium Technology Assessment"
- * @param {string} date       e.g. "March 2026"
+ * @param {string} title        e.g. "NFL Scorecard Overview"
+ * @param {string} subtitle     e.g. "Phase 2 — Stadium Technology Assessment"
+ * @param {string} date         e.g. "March 2026"
+ * @param {string|null} bgImage base64 data URI or null for solid navy fallback
  */
-function addNFLCover(pptx, title, subtitle, date) {
+function addNFLCover(pptx, title, subtitle, date, bgImage = null) {
   const slide = pptx.addSlide();
 
-  // Background — dark navy (production: swap for stadium photo)
-  slide.addShape("rect", {
-    x: 0, y: 0, w: W, h: H,
-    fill: { color: NFL.darkNavy },
-    line: { type: "none" },
-  });
-
-  // Gradient overlay strip (bottom two-thirds — lighter navy tint)
-  slide.addShape("rect", {
-    x: 0, y: H * 0.4, w: W, h: H * 0.6,
-    fill: { type: "gradient", stops: [
-      { position: 0, color: NFL.navy, transparency: 60 },
-      { position: 100, color: NFL.darkNavy, transparency: 0 },
-    ]},
-    line: { type: "none" },
-  });
+  if (bgImage) {
+    // Full-bleed background photo
+    slide.addImage({
+      data: bgImage,
+      x: 0, y: 0, w: W, h: H,
+    });
+    // Dark scrim — ensures text legibility over any photo
+    slide.addShape("rect", {
+      x: 0, y: 0, w: W, h: H,
+      fill: { color: NFL.darkNavy, transparency: 35 },
+      line: { type: "none" },
+    });
+    // Heavier scrim on bottom third where text lives
+    slide.addShape("rect", {
+      x: 0, y: H * 0.55, w: W, h: H * 0.45,
+      fill: { color: NFL.darkNavy, transparency: 10 },
+      line: { type: "none" },
+    });
+  } else {
+    // Solid navy fallback
+    slide.addShape("rect", {
+      x: 0, y: 0, w: W, h: H,
+      fill: { color: NFL.darkNavy },
+      line: { type: "none" },
+    });
+    slide.addShape("rect", {
+      x: 0, y: H * 0.5, w: W, h: H * 0.5,
+      fill: { color: NFL.navy, transparency: 75 },
+      line: { type: "none" },
+    });
+  }
 
   // NFL logo — top left
   addNFLLogo(slide);
@@ -830,7 +855,7 @@ function addNFLContent(pptx, title, subtitle, bullets, headerLabel, pageNum) {
 }
 
 // ─── Demo Deck ────────────────────────────────────────────────────────────────
-function generateDemo() {
+function generateDemo(bgImage = null) {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.defineLayout({ name: "WIDESCREEN", width: W, height: H });
@@ -838,7 +863,7 @@ function generateDemo() {
 
   let pg = 1;
 
-  addNFLCover(pptx, "Scorecard Overview", "Phase 2 — Stadium Technology Assessment", "March 2026");
+  addNFLCover(pptx, "Scorecard Overview", "Phase 2 — Stadium Technology Assessment", "March 2026", bgImage);
 
   addNFLSectionDivider(pptx, "Project Scope & Opportunity Areas", "01");
 
@@ -1010,7 +1035,7 @@ function parseMarkdown(md) {
   return slides;
 }
 
-function buildFromMarkdown(md) {
+function buildFromMarkdown(md, bgImage = null) {
   const pptx = new PptxGenJS();
   pptx.defineLayout({ name: "WIDESCREEN", width: W, height: H });
   pptx.layout = "WIDESCREEN";
@@ -1021,7 +1046,7 @@ function buildFromMarkdown(md) {
   for (const s of slides) {
     ++pg;
     if (s.type === "cover") {
-      addNFLCover(pptx, s.title, s.subtitle, s.date);
+      addNFLCover(pptx, s.title, s.subtitle, s.date, bgImage);
     } else if (s.type === "divider") {
       addNFLSectionDivider(pptx, s.title);
     } else if (s.type === "status") {
@@ -1048,33 +1073,79 @@ function buildFromMarkdown(md) {
 // ─── CLI ──────────────────────────────────────────────────────────────────────
 async function main() {
   const args = process.argv.slice(2);
-  const demo = args.includes("--demo");
-  const inputIdx = args.indexOf("--input");
+  const demo      = args.includes("--demo");
+  const hdQuality = args.includes("--hd");
+  const inputIdx  = args.indexOf("--input");
   const outputIdx = args.indexOf("--output");
+  const fetchIdx  = args.indexOf("--fetch-bg");
+  const genIdx    = args.indexOf("--generate-bg");
+  const bgIdx     = args.indexOf("--bg");
 
+  // ── Resolve background image ──────────────────────────────────────────────
+  let bgImage = null;
+
+  if (bgIdx !== -1 && args[bgIdx + 1]) {
+    // Local file
+    const bgPath = args[bgIdx + 1];
+    if (!fs.existsSync(bgPath)) {
+      console.error(`Error: --bg file not found: ${bgPath}`);
+      process.exit(1);
+    }
+    const ext = path.extname(bgPath).toLowerCase();
+    const mime = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" }[ext] || "image/jpeg";
+    bgImage = `data:${mime};base64,${fs.readFileSync(bgPath).toString("base64")}`;
+    console.log(`  [image] Using local file: ${bgPath}`);
+
+  } else if (fetchIdx !== -1 && args[fetchIdx + 1]) {
+    // Fetch from stock photo API
+    const query = args[fetchIdx + 1];
+    bgImage = await getBackgroundImage({ query }).catch(e => {
+      console.error(`  [image] ${e.message}`);
+      console.warn("  [image] Continuing without background image...");
+      return null;
+    });
+
+  } else if (genIdx !== -1 && args[genIdx + 1]) {
+    // AI-generate
+    const prompt = args[genIdx + 1];
+    bgImage = await getBackgroundImage({ prompt, quality: hdQuality ? "hd" : "standard" }).catch(e => {
+      console.error(`  [image] ${e.message}`);
+      console.warn("  [image] Continuing without background image...");
+      return null;
+    });
+  }
+
+  // ── Build deck ────────────────────────────────────────────────────────────
   let pptx;
   let outputPath;
 
   if (demo) {
-    pptx = generateDemo();
+    pptx = generateDemo(bgImage);
+    const suffix = bgImage ? "_with_bg" : "";
     outputPath = path.join(
       __dirname,
       "../deliverables",
-      `NFL_Template_Demo_${new Date().toISOString().split("T")[0]}.pptx`
+      `NFL_Template_Demo_${new Date().toISOString().split("T")[0]}${suffix}.pptx`
     );
   } else if (inputIdx !== -1 && args[inputIdx + 1]) {
     const inputFile = args[inputIdx + 1];
     const md = fs.readFileSync(inputFile, "utf8");
-    pptx = buildFromMarkdown(md);
-    if (outputIdx !== -1 && args[outputIdx + 1]) {
-      outputPath = args[outputIdx + 1];
-    } else {
-      outputPath = inputFile.replace(/\.md$/, ".pptx");
-    }
+    pptx = buildFromMarkdown(md, bgImage);
+    outputPath = outputIdx !== -1 && args[outputIdx + 1]
+      ? args[outputIdx + 1]
+      : inputFile.replace(/\.md$/, ".pptx");
   } else {
     console.log("Usage:");
     console.log("  node generate_pptx_nfl.js --demo");
-    console.log("  node generate_pptx_nfl.js --input <file.md> [--output <file.pptx>]");
+    console.log("  node generate_pptx_nfl.js --demo --fetch-bg \"nfl stadium aerial\"");
+    console.log("  node generate_pptx_nfl.js --demo --generate-bg \"aerial view of NFL stadium at night\"");
+    console.log("  node generate_pptx_nfl.js --demo --bg /path/to/image.jpg");
+    console.log("  node generate_pptx_nfl.js --input deck.md [--output deck.pptx]");
+    console.log("\nBackground image env vars:");
+    console.log("  UNSPLASH_ACCESS_KEY   free  https://unsplash.com/developers");
+    console.log("  PEXELS_API_KEY        free  https://www.pexels.com/api/");
+    console.log("  OPENAI_API_KEY        paid  https://platform.openai.com/api-keys");
+    console.log("  REPLICATE_API_TOKEN   paid  https://replicate.com/account/api-tokens");
     process.exit(1);
   }
 
