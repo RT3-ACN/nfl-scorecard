@@ -149,6 +149,18 @@ nfl-scorecard/
 
 ---
 
+## Project Dashboard
+
+A standalone HTML dashboard is included in the repo — no server required, just open it in a browser:
+
+```
+deliverables/nfl-scorecard-dashboard.html
+```
+
+Shows: SOW status, deliverables tracker, 6-week Gantt, open decisions, risk register, contacts, and payment schedule. All data is embedded — double-click to open locally or share the file directly with teammates.
+
+---
+
 ## Documentation
 
 | Doc | Read when |
