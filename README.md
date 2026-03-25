@@ -36,12 +36,18 @@ git clone https://github.com/RT3-ACN/nfl-scorecard.git
 cd nfl-scorecard
 ```
 
-**2. Open Claude Code from the repo root**
+**2. Install the pre-push hook (one-time)**
+```bash
+git config core.hooksPath .githooks
+```
+This blocks accidental direct pushes to `main`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch workflow.
+
+**3. Open Claude Code from the repo root**
 ```bash
 claude .
 ```
 
-**3. Verify Claude has context**
+**4. Verify Claude has context**
 
 Ask: *"What's the current state of the project — active question set, known issues, and what phase are we in?"*
 
@@ -86,11 +92,13 @@ Do your work. End every session by capturing decisions:
 We decided [X] today. Update the backlog and tell me if CLAUDE.md needs changing.
 ```
 
-Then commit:
+Then commit and push via a branch:
 ```bash
+git checkout -b survey/[what-changed]
 git add working/
 git commit -m "survey: [what changed]"
-git push origin main
+git push -u origin survey/[what-changed]
+gh pr create
 ```
 
 ---
