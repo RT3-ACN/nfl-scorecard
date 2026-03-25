@@ -1523,6 +1523,7 @@ const Board = (() => {
 
     div.addEventListener('click', e => {
       if (e.target.classList.contains('kb-adv-btn') || e.target.closest('.kb-adv-btn')) return;
+      if (e.target.closest('.kb-card-expand')) return;
       toggleExpand(card.id, div);
     });
 
