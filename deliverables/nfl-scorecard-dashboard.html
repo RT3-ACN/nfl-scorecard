@@ -1329,6 +1329,17 @@ document.getElementById('main').innerHTML = renderNFL();
 
 <script>
 
+// ── global toast notification ────────────────────────────────────────────────
+let _toastTimer = null;
+function toast(msg, dur = 2000) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), dur);
+}
+
 // ═══════════════════════════════════════════════════════════
 // BOARD ENGINE
 // ═══════════════════════════════════════════════════════════
@@ -1512,6 +1523,7 @@ const Board = (() => {
 
     div.addEventListener('click', e => {
       if (e.target.classList.contains('kb-adv-btn') || e.target.closest('.kb-adv-btn')) return;
+      if (e.target.closest('.kb-card-expand')) return;
       toggleExpand(card.id, div);
     });
 
@@ -1594,8 +1606,8 @@ const Board = (() => {
       </div>
       <div style="font-size:9px;color:var(--muted);margin-bottom:4px">Created ${card.created||''}</div>
       <div class="kb-card-foot">
-        <button class="btn btn-ghost btn-xs" onclick="Board.archiveCard('${card.id}')">📦 Archive</button>
-        <button class="btn btn-ghost btn-xs" onclick="Board.collapseCard('${card.id}')">✕ Close</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();Board.archiveCard('${card.id}')">📦 Archive</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();Board.collapseCard('${card.id}')">✕ Close</button>
       </div>
     `;
   }
@@ -1627,7 +1639,8 @@ const Board = (() => {
         <button class="btn btn-ghost btn-xs" onclick="this.closest('.kb-quick-add').remove()">✕</button>
       </div>
     `;
-    body.insertBefore(qa, body.firstChild);
+    body.appendChild(qa);
+    qa.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     const inp = document.getElementById(`qa-title-${colId}`);
     if (inp) { inp.focus(); inp.addEventListener('keydown', e => { if (e.key==='Enter') Board.commitQuickAdd(colId); if (e.key==='Escape') qa.remove(); }); }
   }
