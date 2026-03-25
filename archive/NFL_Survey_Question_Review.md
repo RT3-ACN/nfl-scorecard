@@ -7,53 +7,6 @@ status: active
 
 # NFL Scorecard Survey — Question Review Notes
 
-## Session Log
-
-### 2026-03-18 — Vik Arya Survey Review Session
-
-**Attendees:** Vik Arya, Robert Treiber III, Kieran McConnell
-
-**Methodology decisions confirmed (Vik-directed):**
-- Answer options must reflect realistic stadium scale — calibrate ranges to actual NFL venue requirements (Vik: 200 APs is "ridiculously low")
-- Remove any question answerable from public data (e.g., seating capacity); don't waste respondent time
-- Reframe Wi-Fi questions around consistent fan UX + traffic prioritization (video, social media, POS) — not upload speed alone
-- No vendor names — ask about standardization and strategic fit, not brand inventories
-- Every question must set a clear minimum technical floor — avoid generic or mundane answer options
-- Add layman explanations in guide text for less tech-forward clubs
-- Cybersecurity questions must contextualize why they matter (fan experience, compliance, innovation)
-- Keep survey anchored on technology, not governance/process
-- Do not quote individuals or external sources in question text
-
-**Action items:**
-- Robert: Apply above quality rules to all open TI + DI questions (esp. TI Wi-Fi density, DI cybersecurity questions)
-- Vik: Review updated survey offline and provide further feedback
-- Kieran: Continue supporting question refinement
-
-**Future consideration (v2/roadmap):** Edge AI/LLM deployment questions for Innovation tier
-
----
-
-### 2026-03-18 — Repo + Plugin Build Session
-
-**Completed:**
-- Built private GitHub repo at `RT3-ACN/nfl-scorecard` — full team collaboration infrastructure
-- Created complete directory structure (`working/survey/`, `reference/`, `docs/`, `deliverables/`, `archive/`)
-- Audited and updated all 3 agents (survey-developer, data-analyst, knowledge-manager) to v2 framework
-- Audited and updated all 4 skills (survey-review, question-draft, dashboard-spec, scorecard-report)
-- Created new `/scoring-design` skill — the critical path tool for building scoring methodology from questions
-- Created 6 documentation files (`docs/onboarding.md`, `docs/claude-guide.md`, `docs/framework.md`, `docs/skills-reference.md`, `docs/agents-reference.md`, `docs/workflow.md`)
-- Created `CLAUDE.md` (single source of truth), `CONTRIBUTING.md`, `README.md`, `plugin.json`, `.gitignore`, `.gitattributes`
-- Removed all Excel workbooks from repo except `WIP_NFL_Survey_v0.xlsx` — all others retired
-- Removed 10+ stale root-level files, cleaned archive
-- Reframed scoring: `NFL_Scorecard_Methodology_v1.2.md` labeled as pitch-era prototype; Phase 2 scoring to be built from scratch via `/scoring-design`
-
-**Key decision recorded:**
-- Scoring methodology is NOT being carried forward from pitch. Phase 2 scoring will be designed from the finalized question set using `/scoring-design`. Do not apply v1.2 weights or formulas.
-
-**Still open (survey issues — unchanged):** DI_03, DI_05 (now renamed from ID_03/ID_05), TS_01
-
----
-
 ## Active Question Set (as of 2026-03-18)
 
 **File:** `WIP_NFL_Survey.xlsx` → sheet **"NFL Claude V0"**
@@ -90,27 +43,6 @@ status: active
 - Q4 TI: Vendor list (hard to score) — we intentionally excluded vendor inventories
 - Q7 TI: 5G node count (no context) — axed in their notes, we handle via TI_05 (deployment maturity)
 - Q5 AI: Open text (remove all free text) — we have no open text questions
-
----
-
-## Backlog
-
-### 2026-03-24 — Claude Chat Setup for Teammates
-
-**Status:** Not started
-
-**What:** Create artifacts and instructions so teammates can set up the NFL Scorecard project in **Claude.ai chat** (not Claude Code). Goal is the best possible agent/assistant experience for teammates who aren't using the CLI.
-
-**What to build:**
-- A **project system prompt** for Claude.ai — distills CLAUDE.md + framework rules + quality standards into a single paste-in context block
-- A **reference context artifact** — condensed version of the 9-field schema, v2 layer definitions, answer format rules, scoring template types, and critical quality rules
-- A **setup guide** (`docs/claude-chat-setup.md`) — step-by-step instructions to create a Claude.ai Project, paste the system prompt, and load the reference artifact
-- Optionally: agent-style instructions for survey-developer, data-analyst, and knowledge-manager behaviors (as chat personas teammates can invoke)
-
-**Why:** OneDrive sharing gives teammates the files and Claude Code plugin. But not everyone will use the CLI. Claude.ai chat with a properly configured Project gives near-equivalent context without any install — important for async review, question drafting, and survey work on the go.
-
-**Owner:** Robert Treiber III
-**Blocking:** Nothing — can be done anytime, independent of scoring or pilot work
 
 ---
 

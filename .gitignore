@@ -40,3 +40,7 @@ knowledge/
 # OneDrive system files
 *.tmp
 ~$*
+
+# Node
+node_modules/
+package-lock.json

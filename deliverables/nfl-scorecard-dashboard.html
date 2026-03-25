@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Stadium Technology Scorecard — Phase 2</title>
+<style>
+
+:root {
+  --bg: #0c0c12;
+  --surface: #131320;
+  --surface2: #1a1a2a;
+  --surface3: #202030;
+  --border: #2a2a40;
+  --border2: #383858;
+  --text: #e2e2f2;
+  --text2: #9898bc;
+  --muted: #5a5a7a;
+  --green: #22c55e;  --green-bg: rgba(34,197,94,0.1);
+  --yellow: #f59e0b; --yellow-bg: rgba(245,158,11,0.1);
+  --red: #ef4444;    --red-bg: rgba(239,68,68,0.1);
+  --blue: #6366f1;   --blue-bg: rgba(99,102,241,0.12);
+  --purple: #a855f7; --purple-bg: rgba(168,85,247,0.12);
+  --cyan: #06b6d4;   --cyan-bg: rgba(6,182,212,0.12);
+  --orange: #f97316; --orange-bg: rgba(249,115,22,0.1);
+  --sidebar-w: 232px;
+  --r: 8px; --r-lg: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 13px; display: flex; }
+
+/* ── SIDEBAR ──────────────────────────────────────── */
+#sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; height: 100vh; }
+.sb-header { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); }
+.sb-logo { font-size: 20px; font-weight: 800; letter-spacing: -1px; }
+.sb-logo em { color: var(--blue); font-style: normal; }
+.sb-tagline { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.sb-section { padding: 10px 8px 2px; }
+.sb-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: var(--r); cursor: pointer; color: var(--text2); font-size: 13px; transition: all 0.12s; user-select: none; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--blue-bg); color: var(--blue); font-weight: 600; }
+.nav-item.nav-add { color: var(--muted); font-style: italic; font-size: 12px; }
+.nav-icon { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 8px; min-width: 16px; text-align: center; }
+.nav-badge.y { background: var(--yellow); color: #000; }
+
+/* ── MAIN ─────────────────────────────────────────── */
+#main { flex: 1; overflow-y: auto; padding: 24px 28px; height: 100vh; }
+
+/* ── TOPBAR ───────────────────────────────────────── */
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; gap: 16px; }
+.page-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.page-sub { font-size: 11px; color: var(--text2); margin-top: 3px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.save-ind { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.save-ind.saving { color: var(--yellow); }
+.save-ind.saved { color: var(--green); }
+
+/* ── BUTTONS ──────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: var(--r); font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.12s; white-space: nowrap; font-family: inherit; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: #5254e0; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+.btn-claude { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; }
+.btn-claude:hover { opacity: 0.88; }
+.btn-log { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.btn-log:hover { background: rgba(34,197,94,0.18); }
+.btn-brain { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(168,85,247,0.2); }
+.btn-brain:hover { background: rgba(168,85,247,0.2); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-xs { padding: 3px 8px; font-size: 10px; }
+
+/* ── BADGES ───────────────────────────────────────── */
+.badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.bg { background: var(--green-bg); color: var(--green); }
+.by { background: var(--yellow-bg); color: var(--yellow); }
+.br { background: var(--red-bg); color: var(--red); }
+.bw { background: var(--surface3); color: var(--text2); }
+.bb { background: var(--blue-bg); color: var(--blue); }
+.bp { background: var(--purple-bg); color: var(--purple); }
+.bc { background: var(--cyan-bg); color: var(--cyan); }
+.bo { background: var(--orange-bg); color: var(--orange); }
+.bp1 { background: var(--red-bg); color: var(--red); }
+.bp2 { background: var(--yellow-bg); color: var(--yellow); }
+.bp3 { background: var(--surface3); color: var(--muted); }
+
+/* ── DASHBOARD ────────────────────────────────────── */
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.area-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; }
+.area-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border2); }
+.area-card.sr::after { background: var(--red); }
+.area-card.sy::after { background: var(--yellow); }
+.area-card.sg::after { background: var(--green); }
+.area-card:hover { border-color: var(--border2); background: var(--surface2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.card-icon { font-size: 24px; }
+.card-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
+.card-dot.r { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.card-dot.y { background: var(--yellow); }
+.card-dot.g { background: var(--green); }
+.card-dot.w { background: var(--muted); }
+.card-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.card-counts { display: flex; gap: 5px; flex-wrap: wrap; }
+
+/* ── TOP 5 ────────────────────────────────────────── */
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; margin-bottom: 22px; }
+.box-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.box-title { font-size: 13px; font-weight: 700; }
+.top5-list { display: flex; flex-direction: column; gap: 6px; }
+.top5-row { display: flex; align-items: center; gap: 10px; }
+.top5-n { font-size: 11px; font-weight: 800; color: var(--blue); width: 14px; flex-shrink: 0; }
+.f-input { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; color: var(--text); font-size: 12px; outline: none; font-family: inherit; transition: border-color 0.12s; }
+.f-input:focus { border-color: var(--blue); }
+.f-input::placeholder { color: var(--muted); }
+.f-input.wide { width: 100%; }
+.f-ta { width: 100%; background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; color: var(--text); font-size: 12px; outline: none; font-family: inherit; resize: vertical; line-height: 1.5; transition: border-color 0.12s; }
+.f-ta:focus { border-color: var(--blue); }
+.f-ta::placeholder { color: var(--muted); }
+.f-sel { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; color: var(--text); font-size: 12px; outline: none; font-family: inherit; }
+.f-sel:focus { border-color: var(--blue); }
+.f-sel option { background: var(--surface3); }
+
+/* ── ITEMS LIST ───────────────────────────────────── */
+.items-list { display: flex; flex-direction: column; gap: 10px; }
+.item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; transition: border-color 0.12s; }
+.item-card:hover { border-color: var(--border2); }
+.item-card.open { border-color: var(--blue); }
+.item-row { display: flex; align-items: center; gap: 10px; padding: 13px 14px; cursor: pointer; user-select: none; min-height: 52px; }
+.move-col { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+.mv-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 9px; padding: 2px 3px; line-height: 1; border-radius: 3px; font-family: inherit; }
+.mv-btn:hover:not(:disabled) { background: var(--surface3); color: var(--text); }
+.mv-btn:disabled { opacity: 0.15; cursor: default; }
+.sdot { width: 10px; height: 10px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0; transition: transform 0.12s; }
+.sdot:hover { transform: scale(1.4); }
+.sdot-g { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.sdot-y { background: var(--yellow); }
+.sdot-r { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.sdot-w { background: var(--muted); }
+.item-info { flex: 1; min-width: 0; }
+.item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-sub { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-meta { display: flex; align-items: center; gap: 5px; flex-shrink: 0; flex-wrap: wrap; }
+.chevron { color: var(--muted); font-size: 11px; transition: transform 0.18s; }
+.item-card.open .chevron { transform: rotate(180deg); }
+.item-body { display: none; border-top: 1px solid var(--border); padding: 14px 16px; }
+.item-card.open .item-body { display: block; }
+.b-sec { margin-bottom: 14px; }
+.b-sec:last-child { margin-bottom: 0; }
+.b-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+.next-box { background: var(--surface2); border-left: 3px solid var(--blue); border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 12px; line-height: 1.5; }
+.notes-box { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.tags-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag { background: var(--surface3); color: var(--muted); font-size: 10px; padding: 2px 7px; border-radius: 5px; }
+.task-list { display: flex; flex-direction: column; gap: 3px; }
+.task-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+.task-cb { width: 13px; height: 13px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
+.task-text { font-size: 12px; flex: 1; }
+.task-text.done { text-decoration: line-through; color: var(--muted); }
+.task-del { opacity: 0; background: none; border: none; color: var(--red); cursor: pointer; font-size: 13px; padding: 0 4px; line-height: 1; font-family: inherit; }
+.task-row:hover .task-del { opacity: 0.5; }
+.task-del:hover { opacity: 1 !important; }
+.add-task-row { display: flex; gap: 6px; margin-top: 6px; }
+.item-foot { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border); }
+.item-updated { font-size: 10px; color: var(--muted); margin-left: auto; }
+
+/* ── STATUS MENU ──────────────────────────────────── */
+.smenu { position: fixed; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r); padding: 4px; z-index: 200; min-width: 160px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: none; }
+.smenu.on { display: block; }
+.smenu-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--text2); }
+.smenu-item:hover { background: var(--surface3); color: var(--text); }
+
+/* ── DAILY LOG ────────────────────────────────────── */
+.log-quick { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; margin-bottom: 22px; }
+.log-form { display: flex; flex-direction: column; gap: 10px; }
+.log-form-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.type-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.type-btn { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text2); font-family: inherit; transition: all 0.12s; }
+.type-btn:hover { border-color: var(--border2); color: var(--text); }
+.type-btn.sel { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+.type-btn.sel.tc { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+.type-btn.sel.tp { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-bg); }
+.type-btn.sel.tb { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+.type-btn.sel.ti { border-color: var(--purple); color: var(--purple); background: var(--purple-bg); }
+.type-btn.sel.tn { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-bg); }
+.log-day { margin-bottom: 20px; }
+.log-day-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.log-day-date { font-size: 12px; font-weight: 700; color: var(--text2); }
+.log-day-line { flex: 1; height: 1px; background: var(--border); }
+.log-entry { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 10px; transition: border-color 0.12s; }
+.log-entry:hover { border-color: var(--border2); }
+.log-entry-left { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; flex-shrink: 0; width: 100px; }
+.log-time { font-size: 10px; color: var(--muted); }
+.log-text { flex: 1; font-size: 12px; line-height: 1.5; padding-top: 1px; }
+.log-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; opacity: 0; padding: 0 4px; font-family: inherit; flex-shrink: 0; }
+.log-entry:hover .log-del { opacity: 0.5; }
+.log-del:hover { opacity: 1 !important; color: var(--red); }
+.filter-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.archive-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.archive-card:hover { border-color: var(--border2); background: var(--surface2); }
+
+/* ── BRAIN ────────────────────────────────────────── */
+.brain-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.brain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.brain-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; cursor: pointer; transition: all 0.15s; }
+.brain-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+.brain-card.open { border-color: var(--purple); }
+.brain-card-head { padding: 12px 14px 10px; }
+.brain-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+.brain-name { font-size: 13px; font-weight: 700; line-height: 1.3; flex: 1; }
+.brain-body-preview { font-size: 11px; color: var(--text2); line-height: 1.5; max-height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.brain-card-foot { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; gap: 4px; flex-wrap: wrap; }
+.brain-full { display: none; border-top: 1px solid var(--border); padding: 14px; }
+.brain-card.open .brain-full { display: block; }
+.brain-body-full { font-size: 12px; color: var(--text2); line-height: 1.7; max-height: 300px; overflow-y: auto; }
+.brain-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.search-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+
+/* ── MARKDOWN ─────────────────────────────────────── */
+.md-h1 { font-size: 16px; font-weight: 800; color: var(--text); margin: 12px 0 6px; }
+.md-h2 { font-size: 14px; font-weight: 700; color: var(--text); margin: 10px 0 5px; border-bottom: 1px solid var(--border); padding-bottom: 3px; }
+.md-h3 { font-size: 13px; font-weight: 700; color: var(--text2); margin: 8px 0 4px; }
+.md-p  { margin: 4px 0; line-height: 1.65; }
+.md-ul, .md-ol { padding-left: 18px; margin: 4px 0; }
+.md-ul li, .md-ol li { margin: 2px 0; line-height: 1.6; }
+.md-code { background: var(--surface3); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 11px; color: var(--cyan); }
+.md-pre { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; overflow-x: auto; margin: 8px 0; }
+.md-pre code { font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 11px; color: var(--text2); line-height: 1.6; }
+.md-table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 11px; }
+.md-table th { background: var(--surface3); color: var(--text2); padding: 6px 10px; text-align: left; font-weight: 700; border: 1px solid var(--border); }
+.md-table td { padding: 5px 10px; border: 1px solid var(--border); color: var(--text2); }
+.md-table tr:hover td { background: var(--surface2); }
+.md-hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.md-wikilink { color: var(--purple); cursor: pointer; }
+.md-wikilink:hover { text-decoration: underline; }
+
+/* ── STATS ────────────────────────────────────────── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; text-align: center; }
+.kpi-icon { font-size: 22px; margin-bottom: 6px; }
+.kpi-val { font-size: 28px; font-weight: 800; line-height: 1; }
+.kpi-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.health-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.health-table th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+.health-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.health-table tr:hover td { background: var(--surface2); }
+.activity-bars { display: flex; align-items: flex-end; gap: 2px; height: 56px; }
+.act-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; transition: opacity 0.12s; }
+.act-bar:hover { opacity: 0.8; }
+
+/* ── SEARCH ───────────────────────────────────────── */
+.search-big { width: 100%; background: var(--surface3); border: 1px solid var(--border2); border-radius: var(--r-lg); padding: 12px 16px; color: var(--text); font-size: 15px; outline: none; font-family: inherit; margin-bottom: 20px; }
+.search-big:focus { border-color: var(--blue); }
+.search-big::placeholder { color: var(--muted); }
+mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px; padding: 0 2px; }
+
+/* ── KEYBOARD HELP ────────────────────────────────── */
+.kb-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; align-items: center; }
+.kbd { display: inline-block; background: var(--surface3); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 7px; font-family: 'SF Mono','Monaco',monospace; font-size: 11px; color: var(--text); font-weight: 600; }
+.kb-desc { font-size: 12px; color: var(--text2); }
+
+/* ── MODAL ────────────────────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+.overlay.hidden { display: none; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r-lg); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.6); }
+.modal-wide { max-width: 600px; }
+.modal-head { padding: 18px 20px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-x { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; font-family: inherit; }
+.modal-x:hover { background: var(--surface3); color: var(--text); }
+.modal-body { padding: 18px 20px; }
+.modal-foot { padding: 12px 20px 18px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+.fg { margin-bottom: 14px; }
+.fg label { display: block; font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── CLAUDE MODAL ─────────────────────────────────── */
+.prompt-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; font-size: 11px; font-family: 'SF Mono','Monaco','Consolas',monospace; color: var(--text2); line-height: 1.6; white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
+.prompt-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.prompt-hdr { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: linear-gradient(135deg,rgba(99,102,241,.15),rgba(168,85,247,.15)); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--blue); }
+
+/* ── TASK LOG ─────────────────────────────────────── */
+.log-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 10px; }
+.log-card-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.log-card-meta { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.log-card-prompt { font-size: 10px; font-family: monospace; color: var(--muted); background: var(--bg); padding: 8px; border-radius: 5px; white-space: pre-wrap; max-height: 80px; overflow: hidden; }
+.log-card-foot { display: flex; gap: 6px; margin-top: 10px; }
+
+/* ── MISC ─────────────────────────────────────────── */
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+.empty .ei { font-size: 36px; margin-bottom: 8px; }
+.empty .et { font-size: 13px; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+#toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r); padding: 9px 14px; font-size: 12px; color: var(--text); z-index: 3000; transform: translateY(80px); opacity: 0; transition: all 0.25s; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+#toast.show { transform: translateY(0); opacity: 1; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* Standalone overrides */
+html, body { height: auto; overflow: auto; }
+body { display: block; padding: 0; }
+#main { margin: 0 auto; max-width: 1280px; padding: 24px 28px 48px; }
+</style>
+</head>
+<body>
+<div id="main"></div>
+<script>
+const NFL_DATA = {
+  "updated": "2026-03-25",
+  "engagement": "ISOW 8 to MSOW \u00b7 $100K Fixed Fee \u00b7 32 Clubs + 3 International Teams",
+  "sowStatus": "pending",
+  "sowNote": "Submitted to Jon Noble (NFL, Dir. Club & Stadium IT) \u2014 signature pending",
+  "contacts": [
+    {
+      "name": "Gary Brantley",
+      "role": "SVP & CIO",
+      "org": "NFL",
+      "email": "gary.brantley@nfl.com",
+      "note": "Client lead \u00b7 SOW signatory"
+    },
+    {
+      "name": "Jon Noble",
+      "role": "Director, Club & Stadium IT",
+      "org": "NFL",
+      "email": "",
+      "note": "Day-to-day counterpart \u00b7 SOW pending his team"
+    },
+    {
+      "name": "Jon Wakefield",
+      "role": "Principal, Engagement Lead",
+      "org": "Accenture",
+      "email": "jon.wakefield@accenture.com",
+      "note": "Accenture lead \u00b7 SOW signatory"
+    }
+  ],
+  "deliverables": [
+    {
+      "id": "A",
+      "name": "Stadium Technology Framework",
+      "format": "PPT",
+      "done": false,
+      "note": "Methodology & framework mapping survey data to fan experience business cases"
+    },
+    {
+      "id": "B",
+      "name": "Club Technology Survey",
+      "format": "Google Survey",
+      "done": false,
+      "note": "Survey questions to gather data correlatable to business cases \u2014 shared repeatedly with clubs"
+    },
+    {
+      "id": "C",
+      "name": "Visualization Dashboard",
+      "format": "Tableau",
+      "done": false,
+      "note": "Scoring visualization for 32 clubs + 3 international teams"
+    },
+    {
+      "id": "D",
+      "name": "Guides",
+      "format": "PDF",
+      "done": false,
+      "note": "Survey question guides + dashboard guides tied to Revenue & VOF correlations"
+    }
+  ],
+  "phases": [
+    {
+      "id": "pre",
+      "label": "Pre-SOW Prep",
+      "weeks": "Done",
+      "status": "done",
+      "summary": "Methodology, scoring framework, survey (A\u2013C) built as pre-work"
+    },
+    {
+      "id": "sow",
+      "label": "SOW Signature",
+      "weeks": "Now",
+      "status": "active",
+      "summary": "Waiting on Jon Noble \u00b7 NFL Club & Stadium IT"
+    },
+    {
+      "id": "ph1",
+      "label": "Kickoff & Questions",
+      "weeks": "Wk 1\u20132",
+      "status": "pending",
+      "summary": "Lock question set, run /scoring-design, resolve 5 open decisions"
+    },
+    {
+      "id": "ph2",
+      "label": "Survey Build",
+      "weeks": "Wk 3\u20134",
+      "status": "pending",
+      "summary": "Production survey built, 4-club contacts confirmed"
+    },
+    {
+      "id": "ph3",
+      "label": "Data Collection",
+      "weeks": "Wk 5\u20138",
+      "status": "pending",
+      "summary": "Survey deployed, responses gathered from all 4 pilot clubs"
+    },
+    {
+      "id": "ph4",
+      "label": "Scoring & Analysis",
+      "weeks": "Wk 9\u201310",
+      "status": "pending",
+      "summary": "4 clubs scored, gap analysis, investment prioritization"
+    },
+    {
+      "id": "ph5",
+      "label": "Tableau Dashboard",
+      "weeks": "Wk 11\u201312",
+      "status": "pending",
+      "summary": "Deliverable D built, internal review with Jon Wakefield"
+    },
+    {
+      "id": "ph6",
+      "label": "Readout & Close",
+      "weeks": "Wk 13\u201314",
+      "status": "pending",
+      "summary": "Summary deck delivered, executive readout with Gary Brantley"
+    }
+  ],
+  "openDecisions": [
+    {
+      "id": 1,
+      "text": "Final question set lock before club workshops",
+      "owner": "Robert + Jon Wakefield"
+    },
+    {
+      "id": 2,
+      "text": "Which 3 clubs will participate in validation workshops",
+      "owner": "Jon Noble / NFL"
+    },
+    {
+      "id": 3,
+      "text": "Google Survey setup and distribution method",
+      "owner": "Robert + Jon Noble"
+    },
+    {
+      "id": 4,
+      "text": "Tableau environment access and workspace setup",
+      "owner": "Accenture IT"
+    },
+    {
+      "id": 5,
+      "text": "VIK vs. cash payment election for NFL",
+      "owner": "NFL Finance"
+    }
+  ],
+  "risks": [
+    {
+      "label": "SOW signature delay compresses 6-week delivery window",
+      "level": "red",
+      "mitigation": "Weekly follow-up with Jon Noble; every day matters given May 6 end date"
+    },
+    {
+      "label": "Club data not available in time or usable format",
+      "level": "yellow",
+      "mitigation": "Per SOW \u00a75: assumptions documented; Accenture not responsible for extensive cleansing"
+    },
+    {
+      "label": "Survey non-response from clubs / international teams",
+      "level": "yellow",
+      "mitigation": "Per SOW \u00a75.6: NFL owns response rate follow-up once survey is live"
+    },
+    {
+      "label": "Tableau build compressed if framework not locked by W2",
+      "level": "red",
+      "mitigation": "Lock framework and scoring methodology in Week 1-2 \u2014 no exceptions"
+    },
+    {
+      "label": "Dashboard migration to NFL systems requested post-ISOW",
+      "level": "yellow",
+      "mitigation": "Per SOW \u00a75.8: migration is out of scope; address in future ISOW"
+    }
+  ],
+  "gantt": {
+    "weeks": 6,
+    "lastUpdated": "2026-03-25",
+    "milestoneKey": [
+      {
+        "id": "A",
+        "deliverable": "Stadium Technology Framework (PPT)"
+      },
+      {
+        "id": "B",
+        "deliverable": "Club Technology Survey (Google Survey)"
+      },
+      {
+        "id": "C",
+        "deliverable": "Survey Release to All Clubs"
+      },
+      {
+        "id": "D",
+        "deliverable": "Visualization Dashboard + Guides (Tableau/PDF)"
+      }
+    ],
+    "phases": [
+      {
+        "label": "Framework Development",
+        "colorKey": "navy",
+        "activities": [
+          {
+            "name": "Project Kickoff",
+            "start": 1,
+            "end": 1,
+            "subTasks": [
+              {
+                "text": "Stakeholder alignment meetings",
+                "start": 1,
+                "end": 1
+              },
+              {
+                "text": "Finalize vision & guiding principles",
+                "start": 1,
+                "end": 1
+              },
+              {
+                "text": "Schedule workshops & reviews",
+                "start": 1,
+                "end": 1
+              }
+            ]
+          },
+          {
+            "name": "Framework Development",
+            "start": 2,
+            "end": 4,
+            "milestone": "A",
+            "milestoneLabel": "Del A: Stadium Technology Framework (PPT)",
+            "subTasks": [
+              {
+                "text": "Finalize assessment criteria & scorecard",
+                "start": 2,
+                "end": 3
+              },
+              {
+                "text": "Ingest Voice of Fan (2 questions)",
+                "start": 2,
+                "end": 2
+              },
+              {
+                "text": "Finalize & test methodology + scoring logic",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "text": "Refinement based on validations",
+                "start": 4,
+                "end": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Framework Validations",
+        "colorKey": "blue",
+        "activities": [
+          {
+            "name": "Team Validations (3 clubs)",
+            "start": 3,
+            "end": 4,
+            "milestone": "B",
+            "milestoneLabel": "Del B: Club Technology Survey (Google Survey)",
+            "subTasks": [
+              {
+                "text": "Workshops with 3 clubs",
+                "start": 3,
+                "end": 3
+              },
+              {
+                "text": "Gather framework & survey feedback",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "text": "Update survey based on insights",
+                "start": 4,
+                "end": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Dashboard Development",
+        "colorKey": "lightblue",
+        "activities": [
+          {
+            "name": "Survey Tooling & Dashboard Development",
+            "start": 3,
+            "end": 5,
+            "subTasks": [
+              {
+                "text": "Finalize survey on updated framework",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "text": "Backend survey logic development",
+                "start": 4,
+                "end": 4
+              },
+              {
+                "text": "Tableau visualization build",
+                "start": 4,
+                "end": 5
+              }
+            ]
+          },
+          {
+            "name": "Data Transformation",
+            "start": 4,
+            "end": 5,
+            "subTasks": [
+              {
+                "text": "Survey system logic",
+                "start": 4,
+                "end": 4
+              },
+              {
+                "text": "Data cleanse logic",
+                "start": 4,
+                "end": 5
+              },
+              {
+                "text": "Source data preparation",
+                "start": 4,
+                "end": 5
+              },
+              {
+                "text": "Dashboard creation",
+                "start": 5,
+                "end": 5
+              }
+            ]
+          },
+          {
+            "name": "Testing & Refinements",
+            "start": 5,
+            "end": 5,
+            "subTasks": [
+              {
+                "text": "Functional testing",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "text": "Visualization refinements",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "text": "User guide development",
+                "start": 5,
+                "end": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Survey & Dashboard Finalization",
+        "colorKey": "gray",
+        "activities": [
+          {
+            "name": "Survey Release",
+            "start": 5,
+            "end": 6,
+            "milestone": "C",
+            "milestoneLabel": "Del C: Survey sent to 32 clubs + 3 intl. teams",
+            "subTasks": [
+              {
+                "text": "Finalize survey with NFL",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "text": "Send surveys to clubs & intl. teams",
+                "start": 6,
+                "end": 6
+              }
+            ]
+          },
+          {
+            "name": "Dashboard Release",
+            "start": 6,
+            "end": 6,
+            "milestone": "D",
+            "milestoneLabel": "Del D: Tableau Dashboard + Guides go-live",
+            "subTasks": [
+              {
+                "text": "Finalize dashboard design",
+                "start": 6,
+                "end": 6
+              },
+              {
+                "text": "Provide NFL access to dashboard",
+                "start": 6,
+                "end": 6
+              },
+              {
+                "text": "Deliver guides (PDF)",
+                "start": 6,
+                "end": 6
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sowDate": "2026-03-24",
+  "isowTerm": "March 25, 2026 \u2013 May 6, 2026",
+  "isowDuration": "6 weeks",
+  "payments": [
+    {
+      "amount": "$50,000",
+      "invoiceDate": "2026-03-23",
+      "status": "invoiced"
+    },
+    {
+      "amount": "$50,000",
+      "invoiceDate": "2026-04-30",
+      "status": "pending"
+    }
+  ],
+  "scope": [
+    {
+      "id": "A",
+      "name": "Framework Refinement",
+      "desc": "Update framework for survey and scoring methodology; apply to fan experience journey points; ingest Voice of Fan"
+    },
+    {
+      "id": "B",
+      "name": "Survey Design & Validation",
+      "desc": "Develop survey questions tied to business cases; validate with 3 clubs; develop guides for survey end users"
+    },
+    {
+      "id": "C",
+      "name": "Build & Test Dashboard",
+      "desc": "Develop backend survey logic, Tableau visualization, support scoring/ranking for 32 clubs + 3 international teams; functional testing"
+    },
+    {
+      "id": "D",
+      "name": "Finalized Survey & Dashboard",
+      "desc": "Finalize survey and dashboard; light support sharing with 32 clubs + 3 international teams; provide dashboard access to NFL"
+    }
+  ],
+  "assumptions": [
+    "Accenture builds in Accenture environment \u2014 no NFL internal tools (e.g. NFL Tableau)",
+    "NFL owns driving club survey response rates once survey is live",
+    "Insights are directional/illustrative only \u2014 not investment-grade",
+    "NFL warrants no additional legal/privacy agreements needed for data sharing",
+    "Dashboard remains in Accenture environment; NFL gets temporary demo access",
+    "2 VOF survey questions to be incorporated (no new VOF data collected)",
+    "Onsite travel not expected; all remote"
+  ],
+  "projectOverview": "Accenture will assist the NFL in designing, building, and launching a Stadium Technology Scorecard Dashboard \u2014 a Tableau-based visualization that scores and ranks all 32 NFL clubs and 3 international teams across fan experience and venue technology dimensions. The dashboard will surface performance gaps and support data-driven investment decisions across stadium operations and technology infrastructure.",
+  "inScopeActivities": [
+    {
+      "label": "Framework refinement",
+      "desc": "Align existing data to fan experience journey points and key technology enablers"
+    },
+    {
+      "label": "Survey design & validation",
+      "desc": "Develop survey catalog and validate with 3 NFL clubs via working sessions"
+    },
+    {
+      "label": "Dashboard build & test",
+      "desc": "Develop backend logic, Tableau visualization, and functional testing for all 35 teams"
+    },
+    {
+      "label": "Voice of the Fan integration",
+      "desc": "Incorporate 2 survey questions to correlate fan sentiment with infrastructure data"
+    },
+    {
+      "label": "Production release",
+      "desc": "Finalize survey & dashboard; provide NFL access to share with all clubs"
+    },
+    {
+      "label": "User guides",
+      "desc": "Survey and dashboard guides for end-user consumption"
+    }
+  ],
+  "opportunityAreas": [
+    {
+      "num": "01",
+      "label": "Fan Journey Experience",
+      "desc": "Ticketing, gate entry, wayfinding, concessions, merchandise & in-game social touchpoints",
+      "color": "navy"
+    },
+    {
+      "num": "02",
+      "label": "Connectivity & Infrastructure",
+      "desc": "Network, Wi-Fi, DAS, ISP circuits, edge/cloud, and digital services backbone",
+      "color": "red"
+    },
+    {
+      "num": "03",
+      "label": "Stadium Operations",
+      "desc": "Safety & security, crowd control, food & beverage, VIP suite analytics, ticket acceptance",
+      "color": "red"
+    },
+    {
+      "num": "04",
+      "label": "Data & AI Enablement",
+      "desc": "Application intelligence, data capture maturity, scoring logic & AI-driven logistics",
+      "color": "navy"
+    },
+    {
+      "num": "05",
+      "label": "Transaction & Commerce",
+      "desc": "Cashless payments, merchandise tech, concession throughput & revenue optimization",
+      "color": "navy"
+    },
+    {
+      "num": "06",
+      "label": "Immersive & Future Tech",
+      "desc": "Innovation gaps, next-gen fan engagement, global stadium benchmarking trends",
+      "color": "red"
+    }
+  ]
+};
+
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function td() { return new Date().toISOString().slice(0,10); }
+
+
+// ── NFL PROJECT VIEW ─────────────────────────────────
+function renderNFL() {
+  const nfl = NFL_DATA;
+  const gantt = nfl.gantt || {};
+  const weeks = gantt.weeks || 8;
+  const sowPending = nfl.sowStatus === 'pending';
+
+  // ── Gantt helpers ──
+  const labelBg  = { navy:'#1a3460', blue:'#1e40af', lightblue:'#1e3a5f', gray:'#374151' };
+  const barClr   = { navy:'#2563eb', blue:'#3b82f6', lightblue:'#60a5fa', gray:'#6b7280' };
+  const barSub   = { navy:'rgba(37,99,235,0.35)', blue:'rgba(59,130,246,0.35)', lightblue:'rgba(96,165,250,0.35)', gray:'rgba(107,114,128,0.35)' };
+  const milClr   = { navy:'#93c5fd', blue:'#bfdbfe', lightblue:'#e0f2fe', gray:'#d1d5db' };
+
+  function bar(start, end, bc, height, diamond, mc) {
+    const left  = ((start - 1) / weeks * 100).toFixed(2);
+    const width = ((end - start + 1) / weeks * 100).toFixed(2);
+    // Clamp bar right edge away from container edge to avoid overflow
+    const rightEdge = parseFloat(left) + parseFloat(width);
+    const safeWidth = rightEdge >= 99 ? (99 - parseFloat(left)).toFixed(2) : width;
+    const dmnd = diamond ? `<div style="position:absolute;right:-9px;top:50%;transform:translateY(-50%) rotate(45deg);width:16px;height:16px;background:var(--surface);border:2px solid ${mc};z-index:3;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(-45deg);font-size:7px;font-weight:900;color:${mc};line-height:1">${diamond}</span></div>` : '';
+    return `<div style="position:absolute;left:${left}%;width:${safeWidth}%;top:50%;transform:translateY(-50%);height:${height}px;background:${bc};border-radius:3px;overflow:visible;z-index:2">${dmnd}</div>`;
+  }
+
+  function weekLines() {
+    return Array.from({length:weeks-1},(_,i)=>`<div style="position:absolute;left:${((i+1)/weeks*100).toFixed(1)}%;top:0;bottom:0;width:1px;background:var(--border);z-index:1"></div>`).join('');
+  }
+
+  function phaseCell(lb, label, showLabel, borderB) {
+    return showLabel
+      ? `<div style="width:92px;min-width:92px;background:${lb};${borderB};display:flex;align-items:center;justify-content:center;padding:6px 5px;text-align:center"><span style="font-size:8.5px;font-weight:800;color:rgba(255,255,255,0.92);letter-spacing:0.3px;line-height:1.4">${label}</span></div>`
+      : `<div style="width:92px;min-width:92px;background:${lb};${borderB}"></div>`;
+  }
+
+  let ganttHTML = '';
+  if ((gantt.phases||[]).length) {
+    const weekHdrs = Array.from({length:weeks},(_,i)=>`<div style="text-align:center;padding:7px 0;font-weight:800;font-size:10px;color:var(--text2);border-left:1px solid var(--border)">W${i+1}</div>`).join('');
+    ganttHTML = `<div style="display:flex;background:var(--surface2);border-bottom:2px solid var(--border2)">
+      <div style="width:92px;min-width:92px"></div>
+      <div style="width:195px;min-width:195px;padding:7px 11px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-right:1px solid var(--border)">Key Activities</div>
+      <div style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(${weeks},1fr)">${weekHdrs}</div>
+    </div>`;
+
+    gantt.phases.forEach(ph => {
+      const ck = ph.colorKey||'blue';
+      const lb = labelBg[ck]||'#1e40af';
+      const bc = barClr[ck]||'#3b82f6';
+      const bcs = barSub[ck]||'rgba(59,130,246,0.35)';
+      const mc = milClr[ck]||'#bfdbfe';
+
+      // Build all inner rows (activities + sub-tasks) for this phase
+      let innerRows = '';
+      ph.activities.forEach((act, ai) => {
+        const subTasks = act.subTasks || [];
+        const isLastAct = ai === ph.activities.length - 1;
+
+        // Parent activity row
+        innerRows += `<div style="display:flex;border-bottom:1px solid var(--border);min-height:36px;align-items:stretch">
+          <div style="width:195px;min-width:195px;padding:7px 11px;border-right:1px solid var(--border);display:flex;align-items:center">
+            <span style="font-weight:700;font-size:11px;color:var(--text)">${act.name}</span>
+          </div>
+          <div style="flex:1;min-width:0;position:relative;">${weekLines()}${bar(act.start, act.end, bc, 12, act.milestone||null, mc)}</div>
+        </div>`;
+
+        // Sub-task rows
+        subTasks.forEach((st, si) => {
+          const isLastSub = si === subTasks.length - 1;
+          const isVeryLast = isLastAct && isLastSub;
+          innerRows += `<div style="display:flex;border-bottom:1px solid ${isVeryLast?'transparent':'var(--border)'};min-height:28px;align-items:stretch">
+            <div style="width:195px;min-width:195px;padding:4px 11px 4px 20px;border-right:1px solid var(--border);display:flex;align-items:center;gap:5px">
+              <span style="color:var(--muted);font-size:11px;flex-shrink:0">›</span>
+              <span style="font-size:10px;color:var(--text2);line-height:1.4">${st.text}</span>
+            </div>
+            <div style="flex:1;min-width:0;position:relative;">${weekLines()}${bar(st.start, st.end, bcs, 8, null, mc)}</div>
+          </div>`;
+        });
+      });
+
+      // Phase wrapper: label spans full height on left, inner rows on right
+      ganttHTML += `<div style="display:flex;border-bottom:2px solid var(--border2)">
+        <div style="width:92px;min-width:92px;background:${lb};display:flex;align-items:center;justify-content:center;padding:8px 6px;text-align:center">
+          <span style="font-size:8.5px;font-weight:800;color:rgba(255,255,255,0.92);letter-spacing:0.3px;line-height:1.5">${ph.label}</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">${innerRows}</div>
+      </div>`;
+    });
+  }
+
+  // ── Deliverables ──
+  const doneCount = (nfl.deliverables||[]).filter(d=>d.done).length;
+  const totalCount = (nfl.deliverables||[]).length;
+
+  const delRows = (nfl.deliverables||[]).map(d => {
+    const dot = d.done ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:3px"></div>` : `<div style="width:8px;height:8px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:3px"></div>`;
+    const nameStyle = d.done ? 'text-decoration:line-through;color:var(--muted)' : 'color:var(--text)';
+    return `<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+      ${dot}
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-weight:700;font-size:11px;${nameStyle}">Del. ${d.id} — ${d.name}</span>
+          <span style="background:var(--surface3);color:var(--muted);font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px">${d.format}</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">${d.note}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Open Decisions ──
+  const decRows = (nfl.openDecisions||[]).map(d =>
+    `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:9px;font-weight:900;color:var(--yellow);background:rgba(245,158,11,0.1);border-radius:4px;padding:2px 5px;min-width:16px;text-align:center;flex-shrink:0;height:fit-content">${d.id}</span>
+      <div>
+        <div style="font-size:11px;color:var(--text);line-height:1.4">${d.text}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${d.owner}</div>
+      </div>
+    </div>`
+  ).join('');
+
+  // ── Risks ──
+  const riskRows = (nfl.risks||[]).map(r => {
+    const dot = r.level==='red'?'🔴':r.level==='yellow'?'🟡':'🟢';
+    return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;flex-shrink:0;margin-top:1px">${dot}</span>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text);line-height:1.4">${r.label}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${r.mitigation}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Assumptions ──
+  const assumRows = (nfl.assumptions||[]).map(a =>
+    `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2);line-height:1.4">
+      <span style="color:var(--muted);flex-shrink:0">·</span>${a}
+    </div>`
+  ).join('');
+
+  // ── Payments ──
+  const pymtRows = (nfl.payments||[]).map(p => {
+    const isPaid = p.status==='invoiced';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <span style="font-size:12px;font-weight:800;color:var(--text)">${p.amount}</span>
+        <span style="font-size:10px;color:var(--muted);margin-left:8px">Invoice: ${p.invoiceDate}</span>
+      </div>
+      <span class="badge ${isPaid?'bg':'bw'}" style="font-size:9px">${isPaid?'Invoiced':'Pending'}</span>
+    </div>`;
+  }).join('');
+
+  return `
+  <!-- Header -->
+  <div class="topbar">
+    <div>
+      <div class="page-title">🏈 NFL Stadium Technology Scorecard</div>
+      <div class="page-sub">ISOW 8 to MSOW &nbsp;·&nbsp; ${nfl.isowTerm||''} &nbsp;·&nbsp; ${nfl.isowDuration||''} &nbsp;·&nbsp; Updated ${nfl.updated||''}</div>
+    </div>
+    <span class="badge ${sowPending?'by':'bg'}" style="font-size:11px;padding:6px 14px;align-self:center">
+      ${sowPending ? '🟡 SOW PENDING SIGNATURE' : '🟢 SOW EXECUTED'}
+    </span>
+  </div>
+
+  ${sowPending?`<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.25);border-left:3px solid var(--yellow);border-radius:var(--r);padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--yellow);display:flex;align-items:center;gap:10px">
+    <span style="font-size:16px">⚠</span>
+    <div><strong>Awaiting signature</strong> — ${nfl.sowNote||''} &nbsp;·&nbsp; ISOW effective March 24, 2026 &nbsp;·&nbsp; <strong>Every day of delay compresses the 6-week delivery window.</strong></div>
+  </div>`:''}
+
+  <!-- Stat row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px">
+      <div style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Deliverables</div>
+      <div style="font-size:26px;font-weight:800;color:var(--blue)">${doneCount}<span style="font-size:13px;color:var(--muted);font-weight:600"> / ${totalCount}</span></div>
+      <div style="background:var(--surface3);border-radius:3px;height:4px;margin:8px 0 4px"><div style="background:var(--blue);height:4px;border-radius:3px;width:${totalCount?Math.round(doneCount/totalCount*100):0}%"></div></div>
+      <div style="font-size:10px;color:var(--muted)">${totalCount?Math.round(doneCount/totalCount*100):0}% complete</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px">
+      <div style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Fixed Fee</div>
+      <div style="font-size:26px;font-weight:800;color:var(--green)">$100K</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:6px">2 invoices of $50K</div>
+      <div style="font-size:10px;color:var(--muted)">Invoice 1: 03/23 &nbsp;·&nbsp; Invoice 2: 04/30</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px">
+      <div style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Engagement Term</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">Mar 25 → May 6, 2026</div>
+      <div style="font-size:10px;color:var(--text2)">6 weeks &nbsp;·&nbsp; Fixed scope</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">5-day acceptance window per deliverable</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px">
+      <div style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Scope</div>
+      <div style="font-size:26px;font-weight:800;color:var(--purple)">35<span style="font-size:13px;color:var(--muted);font-weight:600"> teams</span></div>
+      <div style="font-size:10px;color:var(--text2);margin-top:6px">32 NFL clubs + 3 international</div>
+      <div style="font-size:10px;color:var(--muted)">3 clubs for validation workshops</div>
+    </div>
+  </div>
+
+  <!-- Project Overview + Opportunity Areas -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <!-- Overview -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+      <div style="background:#0a1628;padding:12px 16px">
+        <div style="font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px">Project Overview</div>
+      </div>
+      <div style="padding:14px 16px;font-size:11px;color:var(--text2);line-height:1.6;border-bottom:1px solid var(--border)">${nfl.projectOverview||''}</div>
+      <div style="padding:12px 16px">
+        <div style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">In-Scope Activities</div>
+        ${(nfl.inScopeActivities||[]).map(a=>`<div style="display:flex;gap:9px;padding:5px 0;border-bottom:1px solid var(--border)">
+          <span style="color:#2563eb;font-size:12px;flex-shrink:0;margin-top:1px">✓</span>
+          <div style="font-size:10px;line-height:1.4"><strong style="color:var(--text)">${a.label}</strong> <span style="color:var(--text2)">— ${a.desc}</span></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <!-- Opportunity Areas -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+      <div style="background:#0a1628;padding:12px 16px">
+        <div style="font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px">Opportunity Areas Through Benchmarking</div>
+      </div>
+      <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${(nfl.opportunityAreas||[]).map(o=>{
+          const bg = o.color==='red' ? '#c41230' : '#0a2050';
+          return `<div style="background:${bg};border-radius:6px;padding:12px 13px">
+            <div style="font-size:9px;color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:5px">${o.num}</div>
+            <div style="font-size:11px;font-weight:800;color:#fff;margin-bottom:5px;line-height:1.3">${o.label}</div>
+            <div style="font-size:9.5px;color:rgba(255,255,255,0.72);line-height:1.45">${o.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Gantt -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:12px;font-weight:800;color:var(--text)">Phase 2 Roadmap &amp; Gantt</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">SOW indicative timeline &nbsp;·&nbsp; 6 weeks &nbsp;·&nbsp; Last updated ${gantt.lastUpdated||nfl.updated||''} &nbsp;·&nbsp; ◆ = Deliverable milestone</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="badge bb" style="font-size:9px">W1 = Mar 25</span>
+        <span class="badge bb" style="font-size:9px">W6 = May 6</span>
+      </div>
+    </div>
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;gap:20px;flex-wrap:wrap">
+      ${(gantt.milestoneKey||[]).map(m=>`<div style="display:flex;align-items:center;gap:7px;font-size:10px;color:var(--text2)"><div style="width:14px;height:14px;background:var(--surface);border:2px solid var(--blue);transform:rotate(45deg);flex-shrink:0;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(-45deg);font-size:7px;font-weight:900;color:var(--blue)">${m.id}</span></div><span><strong style="color:var(--text)">Del. ${m.id}:</strong> ${m.deliverable}</span></div>`).join('')}
+    </div>
+    <div>${ganttHTML}</div>
+  </div>
+
+  <!-- Bottom grid: 2 cols -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <!-- Deliverables -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:11px;font-weight:800;color:var(--text)">Deliverables</div>
+        <span class="badge ${doneCount===totalCount?'bg':'bw'}" style="font-size:9px">${doneCount}/${totalCount} done</span>
+      </div>
+      <div style="padding:0 16px">${delRows}</div>
+    </div>
+    <!-- Open Decisions -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:11px;font-weight:800;color:var(--text)">Open Decisions</div>
+        <span class="badge by" style="font-size:9px">${(nfl.openDecisions||[]).length} open</span>
+      </div>
+      <div style="padding:0 16px">${decRows}</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <!-- Risks -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:800;color:var(--text)">Risk Register</div>
+      </div>
+      <div style="padding:0 16px">${riskRows}</div>
+    </div>
+    <!-- Contacts + Payments -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <!-- Contacts -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;font-weight:800;color:var(--text)">Key Contacts</div></div>
+        <div style="padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${(nfl.contacts||[]).map(c=>`<div style="padding:8px 10px;background:var(--surface2);border-radius:var(--r);border:1px solid var(--border)">
+            <div style="font-weight:700;font-size:11px;color:var(--text)">${c.name}</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:1px">${c.role}</div>
+            <div style="font-size:10px;color:var(--muted)">${c.org} ${c.email?`· <span style="color:var(--blue)">${c.email}</span>`:''}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;font-style:italic">${c.note}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <!-- Payments -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;font-weight:800;color:var(--text)">Payment Schedule</div></div>
+        <div style="padding:0 16px">${pymtRows}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assumptions -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;font-weight:800;color:var(--text)">Project Assumptions <span style="font-size:10px;font-weight:400;color:var(--muted)">(per SOW §5)</span></div></div>
+    <div style="padding:4px 16px 8px">${assumRows}</div>
+  </div>`;
+}
+
+document.getElementById('main').innerHTML = renderNFL();
+</script>
+</body>
+</html>
