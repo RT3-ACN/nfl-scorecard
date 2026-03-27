@@ -283,4 +283,4 @@ nfl-scorecard/
 
 ---
 
-*Private repository — Accenture/NFL client engagement. Do not share externally.*
+*Accenture/NFL client engagement. RT3-ACN org — collaborator access required to contribute.*
