@@ -1,38 +1,28 @@
 {
-  "columns": [
-    {
-      "id": "backlog",
-      "title": "Backlog",
-      "cards": [
-        { "id": "k-001", "title": "Run /scoring-design", "desc": "Design Phase 2 scoring methodology — critical path. Blocks dashboard, reports, and pilot deployment.", "assignee": "", "tag": "methodology", "priority": "high" },
-        { "id": "k-002", "title": "Finalize question framework", "desc": "Decide: Claude V0 vs V1 vs merged set. Needs team decision with Vik + Kieran.", "assignee": "", "tag": "questions", "priority": "high" },
-        { "id": "k-003", "title": "Deliverable D — Tableau dashboard spec", "desc": "Generate dashboard specification. Dependent on scoring methodology.", "assignee": "", "tag": "deliverable", "priority": "medium" },
-        { "id": "k-004", "title": "Deploy survey to 4-club pilot", "desc": "Deploy club survey once question framework and scoring are locked.", "assignee": "", "tag": "pilot", "priority": "medium" },
-        { "id": "k-005", "title": "Phase 2 summary deck", "desc": "Client-facing summary of Phase 2 methodology and initial findings.", "assignee": "", "tag": "deliverable", "priority": "medium" },
-        { "id": "k-006", "title": "Add Vik + Kieran as GitHub collaborators", "desc": "RT3-ACN/nfl-scorecard — grant access so all three team members can contribute.", "assignee": "Robert", "tag": "admin", "priority": "low" }
-      ]
-    },
-    {
-      "id": "inprogress",
-      "title": "In Progress",
-      "cards": [
-        { "id": "k-007", "title": "Question Review — V0 questions", "desc": "Review all 51 questions in the Question Review tool. Flag issues, add comments.", "assignee": "", "tag": "questions", "priority": "high" },
-        { "id": "k-008", "title": "Fix 3 pre-pilot issues", "desc": "DI_03: normalize counts. DI_05: non-response handling. TS_01: concessionaire POS scenario.", "assignee": "", "tag": "questions", "priority": "high" }
-      ]
-    },
-    {
-      "id": "review",
-      "title": "In Review",
-      "cards": []
-    },
-    {
-      "id": "done",
-      "title": "Done",
-      "cards": [
-        { "id": "k-009", "title": "Deliverable A — Methodology", "desc": "Survey methodology document complete.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" },
-        { "id": "k-010", "title": "Deliverable B — Excel scoring framework v1.2", "desc": "Scoring workbook v1.2 complete.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" },
-        { "id": "k-011", "title": "Deliverable C — Club survey (ready to deploy)", "desc": "Survey instrument built and validated, ready for pilot deployment.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" }
-      ]
-    }
-  ]
+  "cards": [
+    { "id": "c001", "title": "Fix DI_03 — normalize kiosk counts per 10K seats", "type": "issue", "assignee": null, "priority": "high", "tags": [], "linkedId": "DI_03", "notes": "Count normalization needed — absolute counts not comparable across 32 clubs.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c002", "title": "Fix DI_05 — move 'not measured' to non-response option", "type": "issue", "assignee": null, "priority": "high", "tags": [], "linkedId": "DI_05", "notes": "'We have not measured X' must be a non-response (score 0), not option A.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c003", "title": "Fix TS_01 — add concessionaire handling guidance", "type": "issue", "assignee": null, "priority": "high", "tags": [], "linkedId": "TS_01", "notes": "Clubs may not control POS/F&B — question must account for concessionaire-managed scenarios.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c004", "title": "Finalize question selection — V0 vs V1 vs merged", "type": "decision", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Team decision needed with Vik + Kieran. Compare Claude V0 (51q) vs colleague V1 (50q) vs merged.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c005", "title": "Platform decision — Tableau Cloud vs Power BI", "type": "decision", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Jordan reporting back ~Mar 30. Blocks all dashboard spec work.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c006", "title": "One survey link vs persona-split survey", "type": "decision", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Discuss with Vik + Jon Noble on Monday call.", "created": "2026-03-27", "column": "backlog", "archived": false },
+    { "id": "c007", "title": "Review all 51 V0 questions in Question Review tool", "type": "task", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Use Focus mode with Kieran. Flag issues, add comments, save to Excel.", "created": "2026-03-27", "column": "questions", "archived": false },
+    { "id": "c008", "title": "Add team as GitHub collaborators", "type": "task", "assignee": "Robert", "priority": "high", "tags": [], "linkedId": "", "notes": "RT3-ACN/nfl-scorecard — action item from 3/27 standup.", "created": "2026-03-27", "column": "questions", "archived": false },
+    { "id": "c009", "title": "Run /scoring-design — build methodology from question set", "type": "scoring", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Critical path. Blocks dashboard spec, reports, and pilot deployment. Run after questions are locked.", "created": "2026-03-27", "column": "scoring", "archived": false },
+    { "id": "c010", "title": "Confirm scoring methodology with Jon Wakefield", "type": "decision", "assignee": null, "priority": "high", "tags": [], "linkedId": "", "notes": "Required before pilot deployment.", "created": "2026-03-27", "column": "scoring", "archived": false },
+    { "id": "c011", "title": "Run /dashboard-spec — design Tableau/Power BI views", "type": "deliverable", "assignee": null, "priority": "med", "tags": [], "linkedId": "", "notes": "Blocked on: scoring methodology + platform decision.", "created": "2026-03-27", "column": "dashboard", "archived": false },
+    { "id": "c012", "title": "Deploy survey to 4-club pilot", "type": "task", "assignee": null, "priority": "med", "tags": [], "linkedId": "", "notes": "Clubs: Cardinals, Broncos, TBD (Bears or Bucs). Blocked on locked questions + scoring.", "created": "2026-03-27", "column": "pilot", "archived": false },
+    { "id": "c013", "title": "Phase 2 summary deck", "type": "deliverable", "assignee": null, "priority": "med", "tags": [], "linkedId": "", "notes": "Client-facing summary of methodology and initial findings.", "created": "2026-03-27", "column": "pilot", "archived": false },
+    { "id": "c014", "title": "Deliverable A — Methodology document", "type": "deliverable", "assignee": "Robert", "priority": "med", "tags": [], "linkedId": "", "notes": "", "created": "2026-03-27", "column": "done", "archived": false },
+    { "id": "c015", "title": "Deliverable B — Excel scoring framework v1.2", "type": "deliverable", "assignee": "Robert", "priority": "med", "tags": [], "linkedId": "", "notes": "", "created": "2026-03-27", "column": "done", "archived": false },
+    { "id": "c016", "title": "Deliverable C — Club survey instrument", "type": "deliverable", "assignee": "Robert", "priority": "med", "tags": [], "linkedId": "", "notes": "51 V0 questions built and validated, ready for pilot.", "created": "2026-03-27", "column": "done", "archived": false },
+    { "id": "c017", "title": "Project dashboard (localhost:9876)", "type": "deliverable", "assignee": "Robert", "priority": "med", "tags": [], "linkedId": "", "notes": "4 tabs: Overview, Board, Question Review, Meeting Notes. Serves from tools/serve.py.", "created": "2026-03-27", "column": "done", "archived": false }
+  ],
+  "people": [
+    { "id": "p001", "name": "Robert", "initials": "RT" },
+    { "id": "p002", "name": "Vik", "initials": "VA" },
+    { "id": "p003", "name": "Kieran", "initials": "KM" },
+    { "id": "p004", "name": "Austin", "initials": "AS" }
+  ],
+  "allTags": []
 }

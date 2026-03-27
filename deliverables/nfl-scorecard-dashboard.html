@@ -1478,7 +1478,8 @@ document.getElementById('main').innerHTML = renderNFL();
     <button class="btn btn-ghost btn-sm" onclick="Board.toggleArchive()" id="archive-toggle-btn">📦 Archive</button>
     <button class="btn btn-ghost btn-sm" onclick="Board.openPeopleModal()">👥 People</button>
     <div class="btdiv"></div>
-    <button class="btn btn-ghost btn-sm" onclick="Board.exportJSON()">💾 Export JSON</button>
+    <button class="btn btn-ghost btn-sm" onclick="Board.saveToServer()">💾 Save</button>
+    <button class="btn btn-ghost btn-sm" onclick="Board.exportJSON()">📤 Export JSON</button>
     <label class="btn btn-ghost btn-sm" style="cursor:pointer">📥 Import JSON<input type="file" accept=".json" style="display:none" onchange="Board.importJSON(event)"></label>
     <div style="flex:1"></div>
     <span id="board-filt-badge" style="display:none" class="filt-badge">0</span>
@@ -1559,6 +1560,7 @@ const Board = (() => {
   let showingArchive = false;
   let dragSrcId = null;
   let saveTimer = null;
+  let serverSaveTimer = null;
 
   const COLUMNS = [
     { id: 'backlog',   name: 'Backlog',    icon: '📋' },
@@ -1622,7 +1624,22 @@ const Board = (() => {
     };
   }
 
-  function load() {
+  async function load() {
+    // Try server first — shared source of truth
+    try {
+      const r = await fetch('/api/kanban');
+      if (r.ok) {
+        const data = await r.json();
+        if (data && data.cards) {
+          state = data;
+          if (!state.allTags) state.allTags = [];
+          if (!state.people) state.people = [];
+          localStorage.setItem(LS_KEY, JSON.stringify(state));
+          return;
+        }
+      }
+    } catch(e) {}
+    // Fall back to localStorage, then seed
     try { state = JSON.parse(localStorage.getItem(LS_KEY)); } catch(e) {}
     if (!state) state = seedState();
     if (!state.allTags) state.allTags = [];
@@ -1631,10 +1648,25 @@ const Board = (() => {
 
   function save() {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
-    // Sync to RT3 dashboard (fire-and-forget; silent if RT3 server not running)
-    try { fetch('http://localhost:7337/api/nfl-board', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)}).catch(()=>{}); } catch(e) {}
     const ind = document.getElementById('board-save-ind');
-    if (ind) { ind.textContent = 'Saved'; ind.className = 'save-ind saved'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.textContent = ''; }, 2000); }
+    if (ind) { ind.textContent = 'Saved locally'; ind.className = 'save-ind saved'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.textContent = ''; }, 2000); }
+    // Debounced server save — writes kanban-state.json for sharing
+    clearTimeout(serverSaveTimer);
+    serverSaveTimer = setTimeout(saveToServer, 1500);
+  }
+
+  function saveToServer() {
+    const ind = document.getElementById('board-save-ind');
+    if (ind) { ind.textContent = 'Saving…'; ind.className = 'save-ind saving'; }
+    fetch('/api/kanban', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(state)
+    }).then(r => r.json()).then(d => {
+      if (ind) { ind.textContent = d.ok ? '💾 Saved to file' : '⚠ Save failed'; ind.className = d.ok ? 'save-ind saved' : 'save-ind'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.textContent = ''; }, 3000); }
+    }).catch(() => {
+      if (ind) { ind.textContent = '⚠ Server not running'; ind.className = 'save-ind'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.textContent = ''; }, 3000); }
+    });
   }
 
   // ── render all ──────────────────────────────────────────
@@ -2170,8 +2202,8 @@ const Board = (() => {
   }
 
   // ── init ─────────────────────────────────────────────────
-  function init() {
-    load();
+  async function init() {
+    await load();
     // board view is shown via showView()
   }
 
@@ -2187,7 +2219,7 @@ const Board = (() => {
     archiveCard, unarchiveCard, deleteCard, toggleArchive,
     openPeopleModal, closePeopleModal, addPerson, removePerson,
     commitQuickAdd, exportJSON, importJSON,
-    collapseCard,
+    collapseCard, saveToServer,
   };
 })();
 
