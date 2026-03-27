@@ -1,0 +1,38 @@
+{
+  "columns": [
+    {
+      "id": "backlog",
+      "title": "Backlog",
+      "cards": [
+        { "id": "k-001", "title": "Run /scoring-design", "desc": "Design Phase 2 scoring methodology — critical path. Blocks dashboard, reports, and pilot deployment.", "assignee": "", "tag": "methodology", "priority": "high" },
+        { "id": "k-002", "title": "Finalize question framework", "desc": "Decide: Claude V0 vs V1 vs merged set. Needs team decision with Vik + Kieran.", "assignee": "", "tag": "questions", "priority": "high" },
+        { "id": "k-003", "title": "Deliverable D — Tableau dashboard spec", "desc": "Generate dashboard specification. Dependent on scoring methodology.", "assignee": "", "tag": "deliverable", "priority": "medium" },
+        { "id": "k-004", "title": "Deploy survey to 4-club pilot", "desc": "Deploy club survey once question framework and scoring are locked.", "assignee": "", "tag": "pilot", "priority": "medium" },
+        { "id": "k-005", "title": "Phase 2 summary deck", "desc": "Client-facing summary of Phase 2 methodology and initial findings.", "assignee": "", "tag": "deliverable", "priority": "medium" },
+        { "id": "k-006", "title": "Add Vik + Kieran as GitHub collaborators", "desc": "RT3-ACN/nfl-scorecard — grant access so all three team members can contribute.", "assignee": "Robert", "tag": "admin", "priority": "low" }
+      ]
+    },
+    {
+      "id": "inprogress",
+      "title": "In Progress",
+      "cards": [
+        { "id": "k-007", "title": "Question Review — V0 questions", "desc": "Review all 51 questions in the Question Review tool. Flag issues, add comments.", "assignee": "", "tag": "questions", "priority": "high" },
+        { "id": "k-008", "title": "Fix 3 pre-pilot issues", "desc": "DI_03: normalize counts. DI_05: non-response handling. TS_01: concessionaire POS scenario.", "assignee": "", "tag": "questions", "priority": "high" }
+      ]
+    },
+    {
+      "id": "review",
+      "title": "In Review",
+      "cards": []
+    },
+    {
+      "id": "done",
+      "title": "Done",
+      "cards": [
+        { "id": "k-009", "title": "Deliverable A — Methodology", "desc": "Survey methodology document complete.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" },
+        { "id": "k-010", "title": "Deliverable B — Excel scoring framework v1.2", "desc": "Scoring workbook v1.2 complete.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" },
+        { "id": "k-011", "title": "Deliverable C — Club survey (ready to deploy)", "desc": "Survey instrument built and validated, ready for pilot deployment.", "assignee": "Robert", "tag": "deliverable", "priority": "medium" }
+      ]
+    }
+  ]
+}

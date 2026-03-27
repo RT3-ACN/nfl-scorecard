@@ -379,6 +379,126 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 /* filter active badge */
 .filt-badge { background: var(--red); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 8px; min-width: 16px; text-align: center; }
 
+/* ── QUESTION REVIEW VIEW ─────────────────────────── */
+#review-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
+#review-view.active { display: flex; }
+#review-topbar { flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 52px; }
+#review-topbar .rtt { font-size: 14px; font-weight: 800; margin-right: 4px; white-space: nowrap; }
+#review-topbar .btdiv { width: 1px; height: 20px; background: var(--border); margin: 0 2px; }
+#review-filter-row { flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 6px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 36px; }
+#review-filter-row .fl { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
+#rfocus-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+#meetings-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
+#meetings-view.active { display: flex; }
+#meetings-topbar { flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 8px; min-height: 52px; }
+#meetings-topbar .mtt { font-size: 14px; font-weight: 800; }
+#meetings-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.mtg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 10px; overflow: hidden; }
+.mtg-hdr { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; }
+.mtg-hdr:hover { background: var(--surface2); }
+.mtg-date { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.mtg-title { font-size: 13px; font-weight: 700; flex: 1; }
+.mtg-chevron { color: var(--muted); font-size: 11px; transition: transform 0.15s; margin-left: 8px; }
+.mtg-tag { padding: 2px 7px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.mtg-tag.internal { background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
+.mtg-tag.external { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(99,102,241,.3); }
+.mtg-tag.copilot  { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(161,0,255,.25); }
+.mtg-tag.manual   { background: var(--green-bg); color: var(--green); border: 1px solid rgba(16,185,129,.25); }
+#note-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:900; align-items:center; justify-content:center; }
+#note-modal.open { display:flex; }
+#note-modal-box { background:var(--surface); border:1px solid var(--border2); border-radius:var(--r-lg); padding:28px 28px 20px; width:560px; max-width:92vw; display:flex; flex-direction:column; gap:12px; }
+#note-modal-box h3 { font-size:14px; font-weight:800; margin:0; }
+.nml { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+.nmi { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; }
+.nmi:focus { outline:none; border-color:var(--blue); }
+#note-content { min-height:160px; resize:vertical; line-height:1.6; }
+#note-modal-row { display:flex; gap:8px; }
+#note-modal-row > div { flex:1; }
+.mtg-card.open .mtg-chevron { transform: rotate(180deg); }
+.mtg-body { display: none; border-top: 1px solid var(--border); padding: 20px 20px; font-size: 12px; line-height: 1.7; color: var(--text2); }
+.mtg-card.open .mtg-body { display: block; }
+.mtg-body h1,.mtg-body h2 { font-size: 13px; font-weight: 800; color: var(--text); margin: 16px 0 6px; }
+.mtg-body h3 { font-size: 12px; font-weight: 700; color: var(--text2); margin: 12px 0 4px; }
+.mtg-body table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.mtg-body th { background: var(--surface2); color: var(--text2); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 5px 9px; text-align: left; border-bottom: 1px solid var(--border); }
+.mtg-body td { padding: 5px 9px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.mtg-body ul,.mtg-body ol { padding-left: 20px; margin: 4px 0; }
+.mtg-body li { margin: 2px 0; }
+.mtg-body strong { color: var(--text); font-weight: 700; }
+.mtg-body code { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-size: 11px; font-family: 'SF Mono',Consolas,monospace; }
+
+#rmode-toggle { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.rmode-btn { background: none; border: none; color: var(--text2); padding: 4px 13px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+.rmode-btn.on { background: var(--blue); color: #fff; }
+#rprogress-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+#rprogress-text { font-size: 11px; color: var(--muted); white-space: nowrap; }
+#rprogress-bar { width: 80px; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+#rprogress-fill { height: 100%; background: var(--blue); border-radius: 2px; width: 0%; transition: width 0.4s; }
+
+.rfilt { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); transition: all 0.1s; user-select: none; }
+.rfilt:hover { border-color: var(--border2); color: var(--text); }
+.rfilt.on     { border-color: var(--blue);   color: var(--blue);   background: var(--blue-bg); }
+.rfilt.ai.on  { border-color: var(--purple); color: var(--purple); background: var(--purple-bg); }
+.rfilt.di.on  { border-color: var(--cyan);   color: var(--cyan);   background: var(--cyan-bg); }
+.rfilt.ti.on  { border-color: var(--green);  color: var(--green);  background: var(--green-bg); }
+.rfilt.ts.on  { border-color: var(--orange); color: var(--orange); background: var(--orange-bg); }
+
+.rq-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 28px 32px; max-width: 800px; margin: 0 auto; }
+.rq-meta { display: flex; align-items: center; gap: 9px; margin-bottom: 18px; }
+.rq-badge { padding: 2px 9px; border-radius: 5px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.rq-badge.AI { background: var(--purple-bg); color: var(--purple); }
+.rq-badge.DI { background: var(--cyan-bg);   color: var(--cyan);   }
+.rq-badge.TI { background: var(--green-bg);  color: var(--green);  }
+.rq-badge.TS { background: var(--orange-bg); color: var(--orange); }
+.rq-qid    { font-size: 13px; font-weight: 700; }
+.rq-domain { font-size: 11px; color: var(--text2); }
+.rq-issue  { background: var(--yellow-bg); border: 1px solid rgba(245,158,11,.3); border-radius: 6px; padding: 8px 12px; font-size: 11px; color: var(--yellow); margin-bottom: 14px; }
+.rq-slbl   { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+.rq-text   { font-size: 1.15rem; font-weight: 500; line-height: 1.55; margin-bottom: 20px; }
+.rq-answer-block { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 12px; margin-bottom: 16px; }
+.rq-fmt-tag { display: inline-block; background: var(--surface3); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 10px; color: var(--muted); margin-bottom: 8px; }
+.rq-opts { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.rq-opts li { font-size: 12px; padding: 4px 8px; background: rgba(255,255,255,.03); border-left: 2px solid var(--border); border-radius: 3px; }
+.rq-guide  { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+.rq-aguide { font-size: 11px; color: var(--muted); line-height: 1.6; font-family: 'SF Mono',Consolas,monospace; margin-bottom: 14px; }
+.rq-divider { height: 1px; background: var(--border); margin: 18px 0; }
+.rflag-row  { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
+.rflag-btn  { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--r); padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+.rflag-btn.ok     { color: var(--green);  }
+.rflag-btn.revise { color: var(--yellow); }
+.rflag-btn.split  { color: var(--blue);   }
+.rflag-btn.drop   { color: var(--red);    }
+.rflag-btn.on.ok     { background: var(--green-bg);  border-color: var(--green);  }
+.rflag-btn.on.revise { background: var(--yellow-bg); border-color: var(--yellow); }
+.rflag-btn.on.split  { background: var(--blue-bg);   border-color: var(--blue);   }
+.rflag-btn.on.drop   { background: var(--red-bg);    border-color: var(--red);    }
+.rq-comment { width: 100%; min-height: 78px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; font-size: 13px; color: var(--text); font-family: inherit; line-height: 1.5; resize: vertical; transition: border-color 0.12s; margin-bottom: 14px; }
+.rq-comment:focus { outline: none; border-color: var(--blue); }
+.rq-comment::placeholder { color: var(--muted); }
+.rq-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rq-nav-ctr { font-size: 11px; color: var(--muted); }
+.rq-kbd { font-size: 10px; color: var(--muted); margin-left: auto; }
+.rq-kbd kbd { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; font-size: 9px; font-family: monospace; }
+#review-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 14px; }
+.rlist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); margin-bottom: 6px; overflow: hidden; }
+.rlist-card:hover { border-color: var(--border2); }
+.rlist-card.open  { border-color: var(--blue); }
+.rlist-hdr { display: flex; align-items: center; gap: 8px; padding: 11px 14px; cursor: pointer; user-select: none; }
+.rlist-qid     { font-size: 12px; font-weight: 700; min-width: 44px; flex: 0 0 auto; }
+.rlist-domain  { font-size: 11px; color: var(--text2); flex: 0 0 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rlist-preview { font-size: 12px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rflag-chip { padding: 2px 7px; border-radius: 4px; font-size: 9px; font-weight: 700; flex: 0 0 auto; }
+.rflag-chip.ok     { background: var(--green-bg);  color: var(--green);  }
+.rflag-chip.revise { background: var(--yellow-bg); color: var(--yellow); }
+.rflag-chip.split  { background: var(--blue-bg);   color: var(--blue);   }
+.rflag-chip.drop   { background: var(--red-bg);    color: var(--red);    }
+.rflag-chip.none   { background: var(--surface3);  color: var(--muted);  }
+.rissuedot { width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; flex: 0 0 5px; }
+.rcaret { font-size: 9px; color: var(--muted); transition: transform 0.18s; flex: 0 0 auto; }
+.rlist-card.open .rcaret { transform: rotate(180deg); }
+.rlist-body { display: none; border-top: 1px solid var(--border); padding: 16px; }
+.rlist-card.open .rlist-body { display: block; }
+
 </style>
 </head>
 <body>
@@ -396,6 +516,8 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
   <div class="sb-section">
     <div class="sb-label">Tools</div>
     <div class="nav-item" id="nav-board" onclick="showView('board')"><span class="nav-icon">🗂️</span> Board</div>
+    <div class="nav-item" id="nav-review" onclick="showView('review')"><span class="nav-icon">📋</span> Question Review</div>
+    <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📅</span> Meeting Notes</div>
   </div>
   <div class="sb-section">
     <div class="sb-label">Engagement</div>
@@ -430,6 +552,93 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 </main>
 
 <div id="toast"></div>
+
+<!-- REVIEW VIEW -->
+<div id="review-view">
+  <div id="review-topbar">
+    <div id="rmode-toggle">
+      <button class="rmode-btn on" id="rmode-focus" onclick="Review.setMode('focus')">Focus</button>
+      <button class="rmode-btn" id="rmode-list"  onclick="Review.setMode('list')">List</button>
+    </div>
+    <div id="rprogress-wrap">
+      <span id="rprogress-text">0 / 0 reviewed</span>
+      <div id="rprogress-bar"><div id="rprogress-fill"></div></div>
+    </div>
+    <button id="rexport-btn" onclick="Review.doExport()" style="margin-left:12px;background:var(--blue);border:none;color:#fff;padding:5px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Save to Excel</button>
+  </div>
+  <div id="review-filter-row">
+    <span class="rfilt on" id="rfilt-all"  onclick="Review.setLayer('all')">All</span>
+    <span class="rfilt ti" id="rfilt-TI"   onclick="Review.setLayer('TI')">TI</span>
+    <span class="rfilt di" id="rfilt-DI"   onclick="Review.setLayer('DI')">DI</span>
+    <span class="rfilt ts" id="rfilt-TS"   onclick="Review.setLayer('TS')">TS</span>
+    <span class="rfilt ai" id="rfilt-AI"   onclick="Review.setLayer('AI')">AI</span>
+    <span style="width:1px;height:16px;background:var(--border);margin:0 4px;display:inline-block"></span>
+    <span class="rfilt on" id="rfilt-s-all"    onclick="Review.setStatus('all')">All</span>
+    <span class="rfilt" id="rfilt-s-open"   onclick="Review.setStatus('open')">Open</span>
+    <span class="rfilt" id="rfilt-s-ok"     onclick="Review.setStatus('ok')">OK</span>
+    <span class="rfilt" id="rfilt-s-revise" onclick="Review.setStatus('revise')">Revise</span>
+    <span class="rfilt" id="rfilt-s-split"  onclick="Review.setStatus('split')">Split</span>
+    <span class="rfilt" id="rfilt-s-drop"   onclick="Review.setStatus('drop')">Drop</span>
+  </div>
+
+  <!-- FOCUS MODE -->
+  <div id="rfocus-content">
+    <div id="rq-card" class="rq-card"></div>
+    <div id="rfocus-nav" style="display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:16px auto 0;">
+      <button onclick="Review.saveAndGo(-1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">← Prev</button>
+      <span id="rfocus-counter" style="font-size:12px;color:var(--muted)">1 / 51</span>
+      <button onclick="Review.saveAndGo(1)"  style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Next →</button>
+    </div>
+  </div>
+
+  <!-- LIST MODE -->
+  <div id="rlist-content" style="display:none;flex:1;overflow-y:auto;padding:20px 24px;">
+    <div id="rlist-container" style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div id="note-modal">
+  <div id="note-modal-box">
+    <h3>New Meeting Note</h3>
+    <div id="note-modal-row">
+      <div>
+        <div class="nml">Title</div>
+        <input id="note-title" class="nmi" type="text" placeholder="Meeting title…">
+      </div>
+      <div style="max-width:140px">
+        <div class="nml">Date</div>
+        <input id="note-date" class="nmi" type="date">
+      </div>
+    </div>
+    <div>
+      <div class="nml">Type</div>
+      <select id="note-type" class="nmi">
+        <option value="internal">Internal (Accenture only)</option>
+        <option value="external">External (Client meeting)</option>
+      </select>
+    </div>
+    <div>
+      <div class="nml">Notes (markdown supported)</div>
+      <textarea id="note-content" class="nmi" placeholder="## Attendees&#10;- ...&#10;&#10;## Decisions&#10;1. ..."></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px;">
+      <button onclick="Meetings.cancelNote()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+      <button id="note-save-btn" onclick="Meetings.saveNote()" style="background:var(--blue);border:none;color:#fff;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEETINGS VIEW -->
+<div id="meetings-view">
+  <div id="meetings-topbar">
+    <span class="mtt">📅 Meeting Notes</span>
+    <button onclick="Meetings.openNewNote()" style="margin-left:auto;background:var(--blue);border:none;color:#fff;padding:5px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+ New Note</button>
+  </div>
+  <div id="meetings-content">
+    <div id="meetings-list" style="max-width:800px;margin:0 auto;"></div>
+  </div>
+</div>
 
 <script>
 const NFL_DATA = {
@@ -1422,6 +1631,8 @@ const Board = (() => {
 
   function save() {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
+    // Sync to RT3 dashboard (fire-and-forget; silent if RT3 server not running)
+    try { fetch('http://localhost:7337/api/nfl-board', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)}).catch(()=>{}); } catch(e) {}
     const ind = document.getElementById('board-save-ind');
     if (ind) { ind.textContent = 'Saved'; ind.className = 'save-ind saved'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { ind.textContent = ''; }, 2000); }
   }
@@ -1980,24 +2191,361 @@ const Board = (() => {
   };
 })();
 
+// ── Review module ─────────────────────────────────────────────────────────────
+const Review = (() => {
+  const API = '';
+  let questions = [], comments = {}, filtered = [], idx = 0;
+  let mode = 'focus', fLayer = 'all', fStatus = 'all';
+
+  const KNOWN_ISSUES = {
+    'DI_03': 'Count normalization needed — absolute counts not comparable across venue sizes',
+    'DI_05': '"We have not measured" must be a non-response (score 0), not option A',
+    'TS_01': 'Must address concessionaire-managed POS scenario',
+  };
+
+  function activate() {
+    if (questions.length) { applyFilter(); return; }
+    fetch(API + '/api/questions').then(r => r.json()).then(qs => {
+      questions = qs;
+      return fetch(API + '/api/comments');
+    }).then(r => r.json()).then(d => {
+      comments = d.comments || {};
+      applyFilter();
+    }).catch(() => {
+      document.getElementById('rq-card').innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:60px">Could not load questions. Is the server running at localhost:9876?</p>';
+    });
+  }
+
+  function applyFilter() {
+    filtered = questions.filter(q => {
+      const layer = q.id.split('_')[0];
+      if (fLayer !== 'all' && layer !== fLayer) return false;
+      if (fStatus === 'all') return true;
+      if (fStatus === 'open') return !comments[q.id]?.flag;
+      return comments[q.id]?.flag === fStatus;
+    });
+    idx = Math.max(0, Math.min(idx, filtered.length - 1));
+    updateFilters();
+    updateProgress();
+    if (mode === 'focus') renderFocus();
+    else renderList();
+  }
+
+  function updateFilters() {
+    ['all','TI','DI','TS','AI'].forEach(l => {
+      const el = document.getElementById('rfilt-' + (l === 'all' ? 'all' : l));
+      if (el) el.classList.toggle('on', l === fLayer);
+    });
+    ['all','open','ok','revise','split','drop'].forEach(s => {
+      const el = document.getElementById('rfilt-s-' + s);
+      if (el) el.classList.toggle('on', s === fStatus);
+    });
+  }
+
+  function updateProgress() {
+    const reviewed = questions.filter(q => comments[q.id]?.flag).length;
+    const total = questions.length;
+    document.getElementById('rprogress-text').textContent = `${reviewed} / ${total} reviewed`;
+    document.getElementById('rprogress-fill').style.width = total ? (reviewed/total*100)+'%' : '0%';
+  }
+
+  function flagColor(flag) {
+    return {ok:'var(--green)',revise:'var(--yellow)',split:'var(--blue)',drop:'var(--red)'}[flag] || 'var(--muted)';
+  }
+
+  function buildCard(q, inline) {
+    const layer = q.id.split('_')[0];
+    const c = comments[q.id] || {};
+    const issue = KNOWN_ISSUES[q.id] || q.known_issue || '';
+    const flags = [['✓ OK','ok'],['✎ Revise','revise'],['⊕ Split','split'],['✕ Drop','drop']];
+    const flagBtns = flags.map(([lbl,f]) =>
+      `<button class="rflag-btn ${f}${c.flag===f?' on':''}" data-qid="${q.id}" data-flag="${f}" onclick="Review.clickFlag('${q.id}','${f}',this)">${lbl}</button>`
+    ).join('');
+    const opts = q.options.length
+      ? `<ul class="rq-opts">${q.options.map(o=>`<li>${o}</li>`).join('')}</ul>`
+      : '<em style="color:var(--muted);font-size:11px">No options defined</em>';
+    const idAttr = inline ? `data-qid="${q.id}"` : `id="rq-card-inner"`;
+    return `
+      <div class="rq-meta">
+        <span class="rq-badge ${layer}">${layer}</span>
+        <span class="rq-qid">${q.id}</span>
+        <span class="rq-domain">${q.domain}</span>
+      </div>
+      ${issue ? `<div class="rq-issue">⚠ ${issue}</div>` : ''}
+      <div class="rq-slbl">Question</div>
+      <div class="rq-text">${q.question}</div>
+      <div class="rq-answer-block">
+        <div class="rq-slbl">Answer format</div>
+        <span class="rq-fmt-tag">${q.format || '—'} · ${q.style || '—'}</span>
+        ${opts}
+      </div>
+      ${q.guide ? `<div class="rq-slbl">Guide</div><div class="rq-guide">${q.guide}</div>` : ''}
+      ${q.answer_guide ? `<div class="rq-slbl">Answer guide</div><div class="rq-aguide">${q.answer_guide}</div>` : ''}
+      <div class="rq-divider"></div>
+      <div class="rflag-row">${flagBtns}</div>
+      <textarea class="rq-comment" data-qid="${q.id}" placeholder="Add comment or concern…">${c.comment||''}</textarea>
+    `;
+  }
+
+  function renderFocus() {
+    document.getElementById('rfocus-content').style.display = '';
+    document.getElementById('rlist-content').style.display = 'none';
+    const card = document.getElementById('rq-card');
+    if (!filtered.length) {
+      card.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:60px">No questions match the current filter.</p>';
+      document.getElementById('rfocus-counter').textContent = '0 / 0';
+      return;
+    }
+    const q = filtered[idx];
+    card.innerHTML = buildCard(q, false);
+    card.querySelector('textarea').addEventListener('focusout', e => saveComment(q.id));
+    document.getElementById('rfocus-counter').textContent = `${idx+1} / ${filtered.length}`;
+  }
+
+  function renderList() {
+    document.getElementById('rfocus-content').style.display = 'none';
+    document.getElementById('rlist-content').style.display = '';
+    const container = document.getElementById('rlist-container');
+    container.innerHTML = filtered.map(q => {
+      const c = comments[q.id] || {};
+      const layer = q.id.split('_')[0];
+      const chipHtml = c.flag ? `<span class="rflag-chip ${c.flag}" style="background:${flagColor(c.flag)}22;color:${flagColor(c.flag)};border:1px solid ${flagColor(c.flag)}44;border-radius:4px;font-size:9px;font-weight:800;padding:1px 7px;margin-left:8px;">${c.flag.toUpperCase()}</span>` : '';
+      return `
+        <div class="rlist-card" id="rlist-${q.id}">
+          <div class="rlist-hdr" onclick="Review.toggleListItem('${q.id}')">
+            <span class="rq-badge ${layer}" style="flex-shrink:0">${layer}</span>
+            <span style="font-weight:700;font-size:12px;margin-left:6px">${q.id}</span>
+            <span style="font-size:12px;color:var(--text2);margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.question.slice(0,80)}${q.question.length>80?'…':''}</span>
+            ${chipHtml}
+            <span style="margin-left:auto;color:var(--muted);font-size:11px">▼</span>
+          </div>
+          <div class="rlist-body" id="rlist-body-${q.id}" style="display:none">
+            ${buildCard(q, true)}
+          </div>
+        </div>`;
+    }).join('');
+    container.querySelectorAll('textarea').forEach(ta => {
+      ta.addEventListener('focusout', e => saveComment(ta.dataset.qid));
+    });
+  }
+
+  function toggleListItem(qid) {
+    const body = document.getElementById('rlist-body-' + qid);
+    if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+  }
+
+  function clickFlag(qid, flag, btn) {
+    const c = comments[qid] || {};
+    const newFlag = c.flag === flag ? '' : flag;
+    comments[qid] = { ...c, flag: newFlag };
+    const allBtns = btn.parentElement.querySelectorAll('.rflag-btn');
+    allBtns.forEach(b => b.classList.toggle('on', b.dataset.flag === newFlag));
+    saveComment(qid);
+    updateProgress();
+  }
+
+  function saveComment(qid) {
+    const ta = document.querySelector(`textarea[data-qid="${qid}"]`);
+    const c = comments[qid] || {};
+    const comment = ta ? ta.value : (c.comment || '');
+    const flag = c.flag || '';
+    if (!flag && !comment) return;
+    comments[qid] = { ...c, comment, flag };
+    fetch(API + '/api/comments', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ id: qid, flag, comment })
+    }).catch(() => {});
+  }
+
+  function saveAndGo(dir) {
+    if (filtered[idx]) saveComment(filtered[idx].id);
+    idx = Math.max(0, Math.min(idx + dir, filtered.length - 1));
+    renderFocus();
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('rmode-focus').classList.toggle('on', m === 'focus');
+    document.getElementById('rmode-list').classList.toggle('on', m === 'list');
+    if (m === 'focus') renderFocus(); else renderList();
+  }
+
+  function setLayer(l) { fLayer = l; idx = 0; applyFilter(); }
+  function setStatus(s) { fStatus = s; idx = 0; applyFilter(); }
+
+  function doExport() {
+    const btn = document.getElementById('rexport-btn');
+    btn.textContent = '⏳ Saving…';
+    btn.disabled = true;
+    fetch(API + '/api/export', { method: 'POST' }).then(r => r.json()).then(d => {
+      btn.textContent = d.ok ? '✓ Saved!' : '✗ Error';
+      setTimeout(() => { btn.textContent = '💾 Save to Excel'; btn.disabled = false; }, 2000);
+    }).catch(() => { btn.textContent = '✗ Error'; btn.disabled = false; });
+  }
+
+  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport };
+})();
+
+// ── Meetings module ───────────────────────────────────────────────────────────
+const Meetings = (() => {
+  let loaded = false;
+
+  function mdToHtml(md) {
+    function inline(t) {
+      return t
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/`(.+?)`/g,'<code>$1</code>');
+    }
+    const lines = md.split('\n');
+    const out = [];
+    let inTable = false, tableIsFirst = true;
+    let inUl = false, inOl = false;
+
+    function closeBlocks() {
+      if (inTable)  { out.push('</tbody></table>'); inTable = false; tableIsFirst = true; }
+      if (inUl)     { out.push('</ul>'); inUl = false; }
+      if (inOl)     { out.push('</ol>'); inOl = false; }
+    }
+
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+
+      if (/^# /.test(line))   { closeBlocks(); out.push(`<h1>${inline(line.slice(2))}</h1>`); continue; }
+      if (/^## /.test(line))  { closeBlocks(); out.push(`<h2>${inline(line.slice(3))}</h2>`); continue; }
+      if (/^### /.test(line)) { closeBlocks(); out.push(`<h3>${inline(line.slice(4))}</h3>`); continue; }
+
+      if (/^\|/.test(line)) {
+        const cells = line.replace(/^\||\|$/g,'').split('|').map(c => c.trim());
+        if (cells.every(c => /^[-:]+$/.test(c))) continue;
+        if (!inTable) { closeBlocks(); out.push('<table><tbody>'); inTable = true; tableIsFirst = true; }
+        const tag = tableIsFirst ? 'th' : 'td';
+        out.push('<tr>' + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join('') + '</tr>');
+        tableIsFirst = false;
+        continue;
+      } else if (inTable) { out.push('</tbody></table>'); inTable = false; tableIsFirst = true; }
+
+      if (/^- /.test(line)) {
+        if (!inUl) { closeBlocks(); out.push('<ul>'); inUl = true; }
+        out.push(`<li>${inline(line.slice(2))}</li>`);
+        continue;
+      } else if (inUl) { out.push('</ul>'); inUl = false; }
+
+      if (/^\d+\. /.test(line)) {
+        if (!inOl) { closeBlocks(); out.push('<ol>'); inOl = true; }
+        out.push(`<li>${inline(line.replace(/^\d+\. /,''))}</li>`);
+        continue;
+      } else if (inOl) { out.push('</ol>'); inOl = false; }
+
+      if (!line.trim()) { out.push('<br>'); continue; }
+      out.push(`<p>${inline(line)}</p>`);
+    }
+    closeBlocks();
+    return out.join('\n');
+  }
+
+  function renderList(meetings) {
+    const container = document.getElementById('meetings-list');
+    if (!meetings.length) {
+      container.innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:60px">No meeting notes found.</p>';
+      return;
+    }
+    container.innerHTML = meetings.map((m, i) => {
+      const typeTag  = `<span class="mtg-tag ${m.type||'internal'}">${m.type==='external'?'External':'Internal'}</span>`;
+      const srcTag   = `<span class="mtg-tag ${m.source||'manual'}">${m.source==='copilot'?'Copilot AI':'Manual'}</span>`;
+      return `
+        <div class="mtg-card${i===0?' open':''}" id="mtg-${m.slug}">
+          <div class="mtg-hdr" onclick="Meetings.toggle('${m.slug}')">
+            <span class="mtg-date">${m.date||m.slug.slice(0,10)}</span>
+            <span class="mtg-title">${m.title}</span>
+            ${typeTag}${srcTag}
+            <span class="mtg-chevron">${i===0?'▲':'▼'}</span>
+          </div>
+          <div class="mtg-body">${mdToHtml(m.content)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function activate() {
+    if (loaded) return;
+    loaded = true;
+    fetch('/api/meetings').then(r => r.json()).then(renderList).catch(() => {
+      document.getElementById('meetings-list').innerHTML =
+        '<p style="color:var(--muted);text-align:center;margin-top:60px">Could not load meeting notes.</p>';
+    });
+  }
+
+  function toggle(slug) {
+    const card = document.getElementById('mtg-' + slug);
+    if (!card) return;
+    const isOpen = card.classList.contains('open');
+    card.classList.toggle('open', !isOpen);
+    card.querySelector('.mtg-chevron').textContent = isOpen ? '▼' : '▲';
+  }
+
+  function openNewNote() {
+    document.getElementById('note-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-modal').classList.add('open');
+  }
+
+  function cancelNote() {
+    document.getElementById('note-modal').classList.remove('open');
+  }
+
+  function saveNote() {
+    const title   = document.getElementById('note-title').value.trim();
+    const date    = document.getElementById('note-date').value;
+    const mtype   = document.getElementById('note-type').value;
+    const content = document.getElementById('note-content').value.trim();
+    if (!title || !date) { alert('Title and date are required.'); return; }
+    const btn = document.getElementById('note-save-btn');
+    btn.textContent = 'Saving…'; btn.disabled = true;
+    fetch('/api/meetings', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({title, date, type: mtype, content})
+    }).then(r => r.json()).then(d => {
+      if (d.ok) { cancelNote(); reload(); }
+      else { alert('Error saving note.'); }
+    }).finally(() => { btn.textContent = 'Save Note'; btn.disabled = false; });
+  }
+
+  function reload() { loaded = false; activate(); }
+  return { activate, reload, toggle, openNewNote, cancelNote, saveNote };
+})();
+
 // ── view switcher ────────────────────────────────────────────────────────────
 function showView(view) {
   const main = document.getElementById('main');
   const boardView = document.getElementById('board-view');
-  const navOverview = document.getElementById('nav-overview');
-  const navBoard = document.getElementById('nav-board');
+  const reviewView = document.getElementById('review-view');
+  const meetingsView = document.getElementById('meetings-view');
+  const ids = ['nav-overview','nav-board','nav-review','nav-meetings'];
+
+  main.style.display = 'none';
+  boardView.classList.remove('active');
+  reviewView.classList.remove('active');
+  meetingsView.classList.remove('active');
+  ids.forEach(id => { const el = document.getElementById(id); el && el.classList.remove('active'); });
 
   if (view === 'board') {
-    main.style.display = 'none';
     boardView.classList.add('active');
-    navOverview && navOverview.classList.remove('active');
-    navBoard && navBoard.classList.add('active');
+    document.getElementById('nav-board')?.classList.add('active');
     Board.activate();
+  } else if (view === 'review') {
+    reviewView.classList.add('active');
+    document.getElementById('nav-review')?.classList.add('active');
+    Review.activate();
+  } else if (view === 'meetings') {
+    meetingsView.classList.add('active');
+    document.getElementById('nav-meetings')?.classList.add('active');
+    Meetings.reload();
   } else {
     main.style.display = '';
-    boardView.classList.remove('active');
-    navOverview && navOverview.classList.add('active');
-    navBoard && navBoard.classList.remove('active');
+    document.getElementById('nav-overview')?.classList.add('active');
   }
 }
 

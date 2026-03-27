@@ -37,6 +37,13 @@ CLAUDE.local.md
 # Local knowledge brain — personal, not shared
 knowledge/
 
+# PPTX binaries and unpacked content — produce on demand, don't commit
+*.pptx
+deliverables/walkaround_unpacked/
+
+# RT3 dashboard version of review tool — not the project-facing file
+working/survey/nfl_question_review.html
+
 # OneDrive system files
 *.tmp
 ~$*

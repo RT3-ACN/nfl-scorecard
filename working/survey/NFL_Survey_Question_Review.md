@@ -95,6 +95,21 @@ status: active
 
 ## Backlog
 
+### 2026-03-25 — RT3 Dashboard Integration
+
+**Status:** Complete
+
+**What was built:**
+- Standalone NFL dashboard (`deliverables/nfl-scorecard-dashboard.html`) — full Kanban board with 6 columns (Backlog → Done), drag-and-drop, card expand/edit, filters, people, archive, import/export. localStorage key `nfl_board_v1`.
+- NFL server control in RT3 dashboard — Start/Stop/Open buttons in NFL Scorecard view header; polls `/api/nfl-server`; spawns `python -m http.server 9876` from deliverables directory.
+- RT3 dashboard server (`server.py`) — added `nfl_running()`, `nfl_start()`, `nfl_stop()` and `/api/nfl-server` GET/POST routes (port 9876).
+
+**How to use:**
+- From RT3 dashboard (`localhost:7337`) → NFL Scorecard → click **▶ Start Dashboard** → click **🏈 Open NFL Dashboard** → opens `nfl-scorecard-dashboard.html` at `localhost:9876`
+- Kanban board lives entirely in the standalone dashboard, not the RT3 dashboard
+
+---
+
 ### 2026-03-24 — Claude Chat Setup for Teammates
 
 **Status:** Not started
