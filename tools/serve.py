@@ -308,6 +308,12 @@ if __name__ == "__main__":
     print(f"  Kanban Board     →  {url}/kanban")
     print(f"  Ctrl+C to stop\n")
 
+    try:
+        import openpyxl  # noqa: F401
+    except ImportError:
+        print(f"  ⚠  openpyxl not installed — Question Review will show no questions.")
+        print(f"     Fix: pip install openpyxl\n")
+
     if not SURVEY_XLSX.exists():
         print(f"  ⚠  Survey file not found: {SURVEY_XLSX}")
         print(f"     Question Review will not work until the file is present.\n")
