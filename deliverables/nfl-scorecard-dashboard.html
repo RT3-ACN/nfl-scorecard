@@ -2319,7 +2319,7 @@ const Review = (() => {
             ${chipHtml}
             <span style="margin-left:auto;color:var(--muted);font-size:11px">▼</span>
           </div>
-          <div class="rlist-body" id="rlist-body-${q.id}" style="display:none">
+          <div class="rlist-body" id="rlist-body-${q.id}">
             ${buildCard(q, true)}
           </div>
         </div>`;
@@ -2330,8 +2330,8 @@ const Review = (() => {
   }
 
   function toggleListItem(qid) {
-    const body = document.getElementById('rlist-body-' + qid);
-    if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+    const card = document.getElementById('rlist-' + qid);
+    if (card) card.classList.toggle('open');
   }
 
   function clickFlag(qid, flag, btn) {
