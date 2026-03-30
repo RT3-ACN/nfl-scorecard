@@ -77,6 +77,14 @@ Use `/scoring-design` to build the methodology from the question set. Until that
 2. Standard concessionaire handling across all affected questions — **pending**
 3. Scoring weights and roll-up methodology — prototype, **pending finalization**
 4. Venue capacity source: inline TI question or league data post-survey — **pending**
+5. Survey distribution: one link per team vs. multiple persona links — **leaning one link (Vik, 2026-03-30), not final**
+6. Survey delivery mechanism: Google Forms → Google Sheets → Tableau pipeline — **Austin + Jordan testing, not confirmed**
+
+## Confirmed Constraints (2026-03-30 AM Sync)
+- **No client engagement until SOW is signed** — Vik
+- **Scoring output = maturity scale 1–5** (numerical) — confirmed by team; full methodology still TBD
+- **Robert reviews all PRs; main branch is stable** — team process decision
+- **Excel in project folder = source of truth for Claude** — Teams used for collaborative edits only
 
 ## Available Tools
 
