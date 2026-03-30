@@ -398,6 +398,9 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 .mtg-hdr:hover { background: var(--surface2); }
 .mtg-date { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
 .mtg-title { font-size: 13px; font-weight: 700; flex: 1; }
+.mtg-delete { background: none; border: 1px solid transparent; color: var(--muted); font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.15s, color 0.15s, border-color 0.15s; }
+.mtg-hdr:hover .mtg-delete { opacity: 1; }
+.mtg-delete:hover { color: #ef4444; border-color: #ef4444; }
 .mtg-chevron { color: var(--muted); font-size: 11px; transition: transform 0.15s; margin-left: 8px; }
 .mtg-tag { padding: 2px 7px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
 .mtg-tag.internal { background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
@@ -2492,6 +2495,7 @@ const Meetings = (() => {
             <span class="mtg-date">${m.date||m.slug.slice(0,10)}</span>
             <span class="mtg-title">${m.title}</span>
             ${typeTag}${srcTag}
+            <button class="mtg-delete" onclick="event.stopPropagation();Meetings.deleteMeeting('${m.slug}','${m.title.replace(/'/g,"\\'")}');" title="Delete note">&#x2715;</button>
             <span class="mtg-chevron">${i===0?'▲':'▼'}</span>
           </div>
           <div class="mtg-body">${mdToHtml(m.content)}</div>
@@ -2545,8 +2549,16 @@ const Meetings = (() => {
     }).finally(() => { btn.textContent = 'Save Note'; btn.disabled = false; });
   }
 
+  function deleteMeeting(slug, title) {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    fetch(`/api/meetings/${slug}`, { method: 'DELETE' })
+      .then(r => r.json())
+      .then(d => { if (d.ok) reload(); else alert(d.msg || 'Error deleting note.'); })
+      .catch(() => alert('Error deleting note.'));
+  }
+
   function reload() { loaded = false; activate(); }
-  return { activate, reload, toggle, openNewNote, cancelNote, saveNote };
+  return { activate, reload, toggle, openNewNote, cancelNote, saveNote, deleteMeeting };
 })();
 
 // ── view switcher ────────────────────────────────────────────────────────────

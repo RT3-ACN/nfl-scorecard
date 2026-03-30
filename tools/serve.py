@@ -181,6 +181,17 @@ def save_meeting(title: str, date: str, mtype: str, content: str) -> dict:
     return {"ok": True, "slug": slug}
 
 
+def delete_meeting(slug: str) -> dict:
+    import re
+    if not re.match(r'^[a-z0-9-]+$', slug):
+        return {"ok": False, "msg": "Invalid slug"}
+    path = MEETINGS_DIR / f"{slug}.md"
+    if not path.exists():
+        return {"ok": False, "msg": "Meeting note not found"}
+    path.unlink()
+    return {"ok": True}
+
+
 def load_kanban() -> dict:
     if not KANBAN_FILE.exists():
         return _default_kanban()
@@ -238,6 +249,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+    def do_DELETE(self):
+        p = self.path.split("?")[0]
+        if p.startswith("/api/meetings/"):
+            slug = p[len("/api/meetings/"):]
+            self._json(delete_meeting(slug))
+        else:
+            self._json({"error": "Not found"}, 404)
+
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         body   = self.rfile.read(length)
@@ -289,7 +308,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     def _cors(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
     def log_message(self, *_):
@@ -302,21 +321,21 @@ if __name__ == "__main__":
     os.chdir(TOOLS_DIR)
     url = f"http://localhost:{PORT}"
     print(f"\n  NFL Survey Tools")
-    print(f"  ─────────────────────────────")
-    print(f"  Home             →  {url}")
-    print(f"  Question Review  →  {url}/review")
-    print(f"  Kanban Board     →  {url}/kanban")
+    print(f"  -----------------------------")
+    print(f"  Home             ->  {url}")
+    print(f"  Question Review  ->  {url}/review")
+    print(f"  Kanban Board     ->  {url}/kanban")
     print(f"  Ctrl+C to stop\n")
 
     try:
         import openpyxl  # noqa: F401
     except ImportError:
-        print(f"  ⚠  openpyxl not installed — Question Review will show no questions.")
-        print(f"     Fix: pip install openpyxl\n")
+        print(f"  [!] openpyxl not installed -- Question Review will show no questions.")
+        print(f"      Fix: pip install openpyxl\n")
 
     if not SURVEY_XLSX.exists():
-        print(f"  ⚠  Survey file not found: {SURVEY_XLSX}")
-        print(f"     Question Review will not work until the file is present.\n")
+        print(f"  [!] Survey file not found: {SURVEY_XLSX}")
+        print(f"      Question Review will not work until the file is present.\n")
 
     threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     server = http.server.HTTPServer(("localhost", PORT), Handler)
