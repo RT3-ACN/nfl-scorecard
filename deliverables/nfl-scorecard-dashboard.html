@@ -390,6 +390,9 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 #rfocus-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
 #meetings-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
 #meetings-view.active { display: flex; }
+#changes-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
+#changes-view.active { display: flex; }
+#changes-view iframe { flex: 1; border: none; background: #07070f; }
 #meetings-topbar { flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 8px; min-height: 52px; }
 #meetings-topbar .mtt { font-size: 14px; font-weight: 800; }
 #meetings-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
@@ -517,6 +520,7 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
     <div class="sb-label">Tools</div>
     <div class="nav-item" id="nav-board" onclick="showView('board')"><span class="nav-icon">🗂️</span> Board</div>
     <div class="nav-item" id="nav-review" onclick="showView('review')"><span class="nav-icon">📋</span> Question Review</div>
+    <div class="nav-item" id="nav-changes" onclick="showView('changes')"><span class="nav-icon">🔍</span> Revision Notes</div>
     <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📅</span> Meeting Notes</div>
   </div>
   <div class="sb-section">
@@ -1466,6 +1470,13 @@ function renderNFL() {
 document.getElementById('main').innerHTML = renderNFL();
 </script>
 
+
+<!-- ═══════════════════════════════════════════════
+     REVISION NOTES VIEW
+════════════════════════════════════════════════ -->
+<div id="changes-view">
+  <iframe src="/changes" id="changes-iframe" title="Revision Notes"></iframe>
+</div>
 
 <!-- ═══════════════════════════════════════════════
      KANBAN BOARD VIEW
@@ -2555,12 +2566,14 @@ function showView(view) {
   const boardView = document.getElementById('board-view');
   const reviewView = document.getElementById('review-view');
   const meetingsView = document.getElementById('meetings-view');
-  const ids = ['nav-overview','nav-board','nav-review','nav-meetings'];
+  const changesView = document.getElementById('changes-view');
+  const ids = ['nav-overview','nav-board','nav-review','nav-changes','nav-meetings'];
 
   main.style.display = 'none';
   boardView.classList.remove('active');
   reviewView.classList.remove('active');
   meetingsView.classList.remove('active');
+  changesView.classList.remove('active');
   ids.forEach(id => { const el = document.getElementById(id); el && el.classList.remove('active'); });
 
   if (view === 'board') {
@@ -2571,6 +2584,9 @@ function showView(view) {
     reviewView.classList.add('active');
     document.getElementById('nav-review')?.classList.add('active');
     Review.activate();
+  } else if (view === 'changes') {
+    changesView.classList.add('active');
+    document.getElementById('nav-changes')?.classList.add('active');
   } else if (view === 'meetings') {
     meetingsView.classList.add('active');
     document.getElementById('nav-meetings')?.classList.add('active');

@@ -237,7 +237,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         p = self.path.split("?")[0]
 
         if p in ("/", "/index.html", ""):
-            self._file(TOOLS_DIR / "index.html")
+            self._file(DELIVERABLES_DIR / "nfl-scorecard-dashboard.html")
         elif p == "/review":
             self._file(TOOLS_DIR / "review.html")
         elif p == "/kanban":
