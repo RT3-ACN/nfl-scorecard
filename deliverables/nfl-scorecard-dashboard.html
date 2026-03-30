@@ -505,6 +505,20 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 .rlist-body { display: none; border-top: 1px solid var(--border); padding: 16px; }
 .rlist-card.open .rlist-body { display: block; }
 
+/* Colleague revision note box — shown inline inside question cards */
+.rrev-box { border-radius: 7px; padding: 9px 14px; margin-bottom: 16px; }
+.rrev-box .rrev-lbl { font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; opacity: 0.7; }
+.rrev-box .rrev-txt { font-size: 12px; line-height: 1.55; }
+.rrev-box.good    { background: rgba(34,197,94,0.07);  border: 1px solid rgba(34,197,94,0.2);   color: #a0f0c8; }
+.rrev-box.revise  { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); color: #ffd080; }
+.rrev-box.drop    { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25);  color: #f09090; }
+.rrev-box.claude  { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.3);  color: #b0c0f8; }
+.rrev-chip { display:inline-flex; align-items:center; font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px; flex-shrink:0; }
+.rrev-chip.good   { background:rgba(34,197,94,0.12);  color:#a0f0c8; }
+.rrev-chip.revise { background:rgba(245,158,11,0.12); color:#ffd080; }
+.rrev-chip.drop   { background:rgba(239,68,68,0.12);  color:#f09090; }
+.rrev-chip.claude { background:rgba(99,102,241,0.12); color:#b0c0f8; }
+
 </style>
 </head>
 <body>
@@ -523,7 +537,6 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
     <div class="sb-label">Tools</div>
     <div class="nav-item" id="nav-board" onclick="showView('board')"><span class="nav-icon">🗂️</span> Board</div>
     <div class="nav-item" id="nav-review" onclick="showView('review')"><span class="nav-icon">📋</span> Question Review</div>
-    <div class="nav-item" id="nav-changes" onclick="showView('changes')"><span class="nav-icon">🔍</span> Revision Notes</div>
     <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📅</span> Meeting Notes</div>
   </div>
   <div class="sb-section">
@@ -586,6 +599,8 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
     <span class="rfilt" id="rfilt-s-revise" onclick="Review.setStatus('revise')">Revise</span>
     <span class="rfilt" id="rfilt-s-split"  onclick="Review.setStatus('split')">Split</span>
     <span class="rfilt" id="rfilt-s-drop"   onclick="Review.setStatus('drop')">Drop</span>
+    <span style="width:1px;height:16px;background:var(--border);margin:0 4px;display:inline-block"></span>
+    <span class="rfilt" id="rfilt-hasnote"  onclick="Review.toggleHasNote()" title="Show only questions with colleague revision notes">📝 Has Note</span>
   </div>
 
   <!-- FOCUS MODE -->
@@ -2238,10 +2253,19 @@ const Board = (() => {
 })();
 
 // ── Review module ─────────────────────────────────────────────────────────────
+function classifyNote(note) {
+  if (!note) return '';
+  const n = note.toLowerCase();
+  if (n.startsWith('note for claude') || n.includes('{claude')) return 'claude';
+  if (n.includes('not relevant') || n.startsWith('again, what they plan') || n.includes('not relevant to')) return 'drop';
+  if (n.startsWith('good') || n.startsWith('yes') || n.startsWith('yes,')) return 'good';
+  return 'revise';
+}
+
 const Review = (() => {
   const API = '';
   let questions = [], comments = {}, filtered = [], idx = 0;
-  let mode = 'focus', fLayer = 'all', fStatus = 'all';
+  let mode = 'focus', fLayer = 'all', fStatus = 'all', hasNoteFilter = false;
 
   const KNOWN_ISSUES = {
     'DI_03': 'Count normalization needed — absolute counts not comparable across venue sizes',
@@ -2266,6 +2290,7 @@ const Review = (() => {
     filtered = questions.filter(q => {
       const layer = q.id.split('_')[0];
       if (fLayer !== 'all' && layer !== fLayer) return false;
+      if (hasNoteFilter && !q.revision_note?.trim()) return false;
       if (fStatus === 'all') return true;
       if (fStatus === 'open') return !comments[q.id]?.flag;
       return comments[q.id]?.flag === fStatus;
@@ -2299,6 +2324,8 @@ const Review = (() => {
     return {ok:'var(--green)',revise:'var(--yellow)',split:'var(--blue)',drop:'var(--red)'}[flag] || 'var(--muted)';
   }
 
+  const REV_LABEL = { good: '✓ Colleague: Looks Good', revise: '⚠ Colleague: Needs Revision', drop: '✕ Colleague: Consider Dropping', claude: '→ Task for Claude' };
+
   function buildCard(q, inline) {
     const layer = q.id.split('_')[0];
     const c = comments[q.id] || {};
@@ -2311,6 +2338,13 @@ const Review = (() => {
       ? `<ul class="rq-opts">${q.options.map(o=>`<li>${o}</li>`).join('')}</ul>`
       : '<em style="color:var(--muted);font-size:11px">No options defined</em>';
     const idAttr = inline ? `data-qid="${q.id}"` : `id="rq-card-inner"`;
+    const revNote = (q.revision_note || '').trim();
+    const revType = classifyNote(revNote);
+    const revNoteHtml = revNote ? `
+      <div class="rrev-box ${revType}">
+        <div class="rrev-lbl">${REV_LABEL[revType] || 'Revision Note'}</div>
+        <div class="rrev-txt">${revNote}</div>
+      </div>` : '';
     return `
       <div class="rq-meta">
         <span class="rq-badge ${layer}">${layer}</span>
@@ -2320,6 +2354,7 @@ const Review = (() => {
       ${issue ? `<div class="rq-issue">⚠ ${issue}</div>` : ''}
       <div class="rq-slbl">Question</div>
       <div class="rq-text">${q.question}</div>
+      ${revNoteHtml}
       <div class="rq-answer-block">
         <div class="rq-slbl">Answer format</div>
         <span class="rq-fmt-tag">${q.format || '—'} · ${q.style || '—'}</span>
@@ -2356,12 +2391,18 @@ const Review = (() => {
       const c = comments[q.id] || {};
       const layer = q.id.split('_')[0];
       const chipHtml = c.flag ? `<span class="rflag-chip ${c.flag}" style="background:${flagColor(c.flag)}22;color:${flagColor(c.flag)};border:1px solid ${flagColor(c.flag)}44;border-radius:4px;font-size:9px;font-weight:800;padding:1px 7px;margin-left:8px;">${c.flag.toUpperCase()}</span>` : '';
+      const revNoteChip = q.revision_note?.trim() ? (() => {
+        const t = classifyNote(q.revision_note);
+        const icon = {good:'✓',revise:'⚠',drop:'✕',claude:'→'}[t] || '📝';
+        return `<span class="rrev-chip ${t}">${icon} ${t}</span>`;
+      })() : '';
       return `
         <div class="rlist-card" id="rlist-${q.id}">
           <div class="rlist-hdr" onclick="Review.toggleListItem('${q.id}')">
             <span class="rq-badge ${layer}" style="flex-shrink:0">${layer}</span>
             <span style="font-weight:700;font-size:12px;margin-left:6px">${q.id}</span>
             <span style="font-size:12px;color:var(--text2);margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.question.slice(0,80)}${q.question.length>80?'…':''}</span>
+            ${revNoteChip}
             ${chipHtml}
             <span style="margin-left:auto;color:var(--muted);font-size:11px">▼</span>
           </div>
@@ -2420,6 +2461,13 @@ const Review = (() => {
   function setLayer(l) { fLayer = l; idx = 0; applyFilter(); }
   function setStatus(s) { fStatus = s; idx = 0; applyFilter(); }
 
+  function toggleHasNote() {
+    hasNoteFilter = !hasNoteFilter;
+    const el = document.getElementById('rfilt-hasnote');
+    if (el) el.classList.toggle('on', hasNoteFilter);
+    idx = 0; applyFilter();
+  }
+
   function doExport() {
     const btn = document.getElementById('rexport-btn');
     btn.textContent = '⏳ Saving…';
@@ -2430,7 +2478,7 @@ const Review = (() => {
     }).catch(() => { btn.textContent = '✗ Error'; btn.disabled = false; });
   }
 
-  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport };
+  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote };
 })();
 
 // ── Meetings module ───────────────────────────────────────────────────────────
@@ -2588,14 +2636,12 @@ function showView(view) {
   const boardView = document.getElementById('board-view');
   const reviewView = document.getElementById('review-view');
   const meetingsView = document.getElementById('meetings-view');
-  const changesView = document.getElementById('changes-view');
-  const ids = ['nav-overview','nav-board','nav-review','nav-changes','nav-meetings'];
+  const ids = ['nav-overview','nav-board','nav-review','nav-meetings'];
 
   main.style.display = 'none';
   boardView.classList.remove('active');
   reviewView.classList.remove('active');
   meetingsView.classList.remove('active');
-  changesView.classList.remove('active');
   ids.forEach(id => { const el = document.getElementById(id); el && el.classList.remove('active'); });
 
   if (view === 'board') {
@@ -2606,9 +2652,6 @@ function showView(view) {
     reviewView.classList.add('active');
     document.getElementById('nav-review')?.classList.add('active');
     Review.activate();
-  } else if (view === 'changes') {
-    changesView.classList.add('active');
-    document.getElementById('nav-changes')?.classList.add('active');
   } else if (view === 'meetings') {
     meetingsView.classList.add('active');
     document.getElementById('nav-meetings')?.classList.add('active');
