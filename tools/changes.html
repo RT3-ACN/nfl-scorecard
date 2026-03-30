@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFL Survey — Revision Notes</title>
+<style>
+:root {
+  --bg:       #07070f;
+  --card:     #0f0f1c;
+  --card2:    #141426;
+  --border:   #1e1e35;
+  --purple:   #A100FF;
+  --text:     #e8e8f0;
+  --muted:    #66668a;
+  --muted2:   #3a3a5c;
+
+  --ai:    #c44dff;
+  --di:    #00d4ff;
+  --ti:    #00e676;
+  --ts:    #ffa726;
+
+  --good:    #00e676;
+  --revise:  #ffa726;
+  --drop:    #ef5350;
+  --claude:  #42a5f5;
+  --neutral: #66668a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+#header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,7,15,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+
+#header-title { font-size: 15px; font-weight: 700; white-space: nowrap; }
+#header a { color: var(--muted); font-size: 12px; text-decoration: none; }
+#header a:hover { color: var(--text); }
+
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+
+.filter-btn {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); border-radius: 6px;
+  padding: 4px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--purple); color: var(--text); }
+.filter-btn.active { color: #fff; border-color: transparent; }
+.filter-btn.f-all.active     { background: var(--purple); }
+.filter-btn.f-ti.active      { background: #1a4a2e; color: var(--ti); border-color: var(--ti); }
+.filter-btn.f-di.active      { background: #0a3040; color: var(--di); border-color: var(--di); }
+.filter-btn.f-ts.active      { background: #3a2a0a; color: var(--ts); border-color: var(--ts); }
+.filter-btn.f-ai.active      { background: #2a0a40; color: var(--ai); border-color: var(--ai); }
+.filter-btn.f-good.active    { background: #0a2a1a; color: var(--good); border-color: var(--good); }
+.filter-btn.f-revise.active  { background: #2a1a00; color: var(--revise); border-color: var(--revise); }
+.filter-btn.f-drop.active    { background: #2a0a0a; color: var(--drop); border-color: var(--drop); }
+.filter-btn.f-claude.active  { background: #0a1a2a; color: var(--claude); border-color: var(--claude); }
+
+#stats {
+  padding: 12px 24px;
+  display: flex; gap: 20px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+}
+.stat { display: flex; align-items: center; gap: 6px; }
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+#list { padding: 16px 24px; display: flex; flex-direction: column; gap: 10px; max-width: 1100px; margin: 0 auto; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0 16px;
+}
+.card:hover { border-color: #2e2e4a; }
+
+.card-id {
+  font-size: 13px; font-weight: 700;
+  padding-top: 2px;
+}
+.card-id.ti { color: var(--ti); }
+.card-id.di { color: var(--di); }
+.card-id.ts { color: var(--ts); }
+.card-id.ai { color: var(--ai); }
+
+.card-body { display: flex; flex-direction: column; gap: 8px; }
+
+.card-question {
+  font-size: 14px; font-weight: 600; line-height: 1.45;
+  color: var(--text);
+}
+
+.card-domain { font-size: 11px; color: var(--muted); }
+
+.note-box {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px; line-height: 1.55;
+}
+.note-box.good    { background: rgba(0,230,118,.07); border: 1px solid rgba(0,230,118,.2); color: #a0f0c8; }
+.note-box.revise  { background: rgba(255,167,38,.07); border: 1px solid rgba(255,167,38,.25); color: #ffd080; }
+.note-box.drop    { background: rgba(239,83,80,.08); border: 1px solid rgba(239,83,80,.25); color: #f09090; }
+.note-box.claude  { background: rgba(66,165,245,.08); border: 1px solid rgba(66,165,245,.3); color: #90c8f8; }
+.note-box.neutral { background: var(--card2); border: 1px solid var(--border); color: var(--text); }
+
+.note-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 4px; opacity: 0.7;
+}
+
+#empty {
+  text-align: center; padding: 80px 24px;
+  color: var(--muted); font-size: 14px; display: none;
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <span id="header-title">Revision Notes</span>
+  <a href="/">← Home</a>
+
+  <div class="filters">
+    <span style="font-size:11px;color:var(--muted);align-self:center">Domain:</span>
+    <button class="filter-btn f-all active"  data-filter="domain" data-val="">All</button>
+    <button class="filter-btn f-ti"  data-filter="domain" data-val="TI">TI</button>
+    <button class="filter-btn f-di"  data-filter="domain" data-val="DI">DI</button>
+    <button class="filter-btn f-ts"  data-filter="domain" data-val="TS">TS</button>
+    <button class="filter-btn f-ai"  data-filter="domain" data-val="AI">AI</button>
+    <span style="font-size:11px;color:var(--muted);align-self:center;margin-left:8px">Type:</span>
+    <button class="filter-btn f-all active"  data-filter="type"   data-val="">All</button>
+    <button class="filter-btn f-good"   data-filter="type" data-val="good">Good</button>
+    <button class="filter-btn f-revise" data-filter="type" data-val="revise">Revise</button>
+    <button class="filter-btn f-drop"   data-filter="type" data-val="drop">Drop</button>
+    <button class="filter-btn f-claude" data-filter="type" data-val="claude">For Claude</button>
+  </div>
+</div>
+
+<div id="stats">
+  <span class="stat"><span class="stat-dot" style="background:var(--good)"></span><span id="cnt-good">0 good</span></span>
+  <span class="stat"><span class="stat-dot" style="background:var(--revise)"></span><span id="cnt-revise">0 revise</span></span>
+  <span class="stat"><span class="stat-dot" style="background:var(--drop)"></span><span id="cnt-drop">0 drop</span></span>
+  <span class="stat"><span class="stat-dot" style="background:var(--claude)"></span><span id="cnt-claude">0 for claude</span></span>
+  <span class="stat"><span class="stat-dot" style="background:var(--neutral)"></span><span id="cnt-total">— total</span></span>
+</div>
+
+<div id="list"></div>
+<div id="empty">No notes match the current filter.</div>
+
+<script>
+const DOMAIN_PREFIX = id => id.split('_')[0];
+
+function classifyNote(note) {
+  if (!note) return 'neutral';
+  const n = note.toLowerCase();
+  if (n.startsWith('note for claude') || n.includes('{claude')) return 'claude';
+  if (n.includes('not relevant') || n.startsWith('again, what they plan') || n.includes('not relevant to')) return 'drop';
+  if (n.startsWith('good') || n.startsWith('yes') || n.startsWith('yes,')) return 'good';
+  return 'revise';
+}
+
+const LABEL = { good: 'Looks Good', revise: 'Needs Revision', drop: 'Consider Dropping', claude: 'Task for Claude', neutral: 'Note' };
+
+let allCards = [];
+let domainFilter = '';
+let typeFilter   = '';
+
+function render() {
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+  list.innerHTML = '';
+  let shown = 0;
+  allCards.forEach(c => {
+    const domainMatch = !domainFilter || DOMAIN_PREFIX(c.id) === domainFilter;
+    const typeMatch   = !typeFilter   || c.noteType === typeFilter;
+    if (!domainMatch || !typeMatch) return;
+    shown++;
+    const div = document.createElement('div');
+    div.className = 'card';
+    const prefix = DOMAIN_PREFIX(c.id).toLowerCase();
+    div.innerHTML = `
+      <div class="card-id ${prefix}">${c.id}</div>
+      <div class="card-body">
+        <div class="card-question">${c.question}</div>
+        <div class="card-domain">${c.domain}</div>
+        <div class="note-box ${c.noteType}">
+          <div class="note-label">${LABEL[c.noteType]}</div>
+          ${c.note}
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+  empty.style.display = shown === 0 ? 'block' : 'none';
+}
+
+function updateStats(data) {
+  const counts = { good: 0, revise: 0, drop: 0, claude: 0 };
+  data.forEach(q => counts[q.noteType] = (counts[q.noteType] || 0) + 1);
+  document.getElementById('cnt-good').textContent   = `${counts.good} good`;
+  document.getElementById('cnt-revise').textContent = `${counts.revise} revise`;
+  document.getElementById('cnt-drop').textContent   = `${counts.drop} drop`;
+  document.getElementById('cnt-claude').textContent = `${counts.claude} for claude`;
+  document.getElementById('cnt-total').textContent  = `${data.length} total`;
+}
+
+async function load() {
+  const res  = await fetch('/api/revision-notes');
+  const data = await res.json();
+  allCards = data.map(q => ({
+    id:       q.id,
+    question: q.question,
+    domain:   q.domain,
+    note:     q.revision_note,
+    noteType: classifyNote(q.revision_note),
+  }));
+  updateStats(allCards);
+  render();
+}
+
+// filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.filter;
+    const val   = btn.dataset.val;
+    // deactivate siblings in same group
+    document.querySelectorAll(`.filter-btn[data-filter="${group}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (group === 'domain') domainFilter = val;
+    else                    typeFilter   = val;
+    render();
+  });
+});
+
+load();
+</script>
+</body>
+</html>
