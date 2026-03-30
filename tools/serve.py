@@ -136,15 +136,16 @@ def export_to_excel() -> dict:
     try:
         comments = load_comments().get("comments", {})
         wb = openpyxl.load_workbook(str(SURVEY_XLSX))
-        ws = wb["NFL Claude V0"]
-        ws.cell(row=7, column=10, value="Review Comment")
-        ws.cell(row=7, column=11, value="Review Flag")
-        for row in range(8, ws.max_row + 1):
-            qid = ws.cell(row=row, column=2).value
+        ws = wb[SURVEY_SHEET]
+        # Header row=1, Question ID=col 3; write review columns at end
+        ws.cell(row=1, column=13, value="Review Comment")
+        ws.cell(row=1, column=14, value="Review Flag")
+        for row in range(2, ws.max_row + 1):
+            qid = ws.cell(row=row, column=3).value
             if qid and str(qid).strip() in comments:
                 c = comments[str(qid).strip()]
-                ws.cell(row=row, column=10, value=c.get("comment", ""))
-                ws.cell(row=row, column=11, value=c.get("flag", ""))
+                ws.cell(row=row, column=13, value=c.get("comment", ""))
+                ws.cell(row=row, column=14, value=c.get("flag", ""))
         wb.save(str(SURVEY_XLSX))
         return {"ok": True, "file": SURVEY_XLSX.name}
     except Exception as e:
