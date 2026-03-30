@@ -26,10 +26,12 @@ KANBAN_FILE    = TOOLS_DIR / "kanban-state.json"
 DASHBOARD_HTML = DELIVERABLES_DIR / "nfl-scorecard-dashboard.html"
 MEETINGS_DIR   = NFL_DIR / "meetings"
 
+SURVEY_SHEET  = "Combined Survey Questions"
+
 KNOWN_ISSUES = {
-    "DI_03": "Count normalization needed — absolute counts not comparable across venue sizes",
-    "DI_05": "'We have not measured' must be a non-response (score 0), not option A",
-    "TS_01": "Must address concessionaire-managed POS scenario",
+    "DI_3": "Count normalization needed — absolute counts not comparable across venue sizes",
+    "DI_5": "'We have not measured' must be a non-response (score 0), not option A",
+    "TS_3": "Must address concessionaire-managed POS scenario",
 }
 
 MIME = {
@@ -56,25 +58,36 @@ def parse_questions() -> list:
             return _q_cache
         import openpyxl
         wb = openpyxl.load_workbook(str(SURVEY_XLSX), data_only=True)
-        ws = wb["NFL Claude V0"]
+        ws = wb[SURVEY_SHEET]
+        rows = list(ws.iter_rows(values_only=True))
+        headers = [str(c).strip() if c else "" for c in rows[0]]
+
+        def col(row, name, fallback=""):
+            try:
+                v = row[headers.index(name)]
+                return str(v).strip() if v else fallback
+            except (ValueError, IndexError):
+                return fallback
+
         questions = []
-        for row in ws.iter_rows(min_row=8, max_col=9, values_only=True):
-            cat, qid, domain, question, guide, fmt, style, options, answer_guide = row
+        for row in rows[1:]:
+            qid = col(row, "Question ID")
             if not qid:
                 continue
-            qid_str = str(qid).strip()
-            opts = [o.strip() for o in str(options).split("|") if o.strip()] if options else []
+            opts_raw = col(row, "Answer Options Definitions")
+            opts = [o.strip() for o in opts_raw.split("|") if o.strip()] if opts_raw else []
             questions.append({
-                "id":           qid_str,
-                "category":     str(cat).strip()          if cat          else "",
-                "domain":       str(domain).strip()       if domain       else "",
-                "question":     str(question).strip()     if question     else "",
-                "guide":        str(guide).strip()        if guide        else "",
-                "format":       str(fmt).strip()          if fmt          else "",
-                "style":        str(style).strip()        if style        else "",
+                "id":           qid,
+                "category":     col(row, "Survey Category"),
+                "domain":       col(row, "Domain Covered"),
+                "question":     col(row, "Question"),
+                "guide":        col(row, "Guide Explanation"),
+                "format":       col(row, "Answer Format"),
+                "style":        col(row, "Answer Options Style"),
                 "options":      opts,
-                "answer_guide": str(answer_guide).strip() if answer_guide else "",
-                "known_issue":  KNOWN_ISSUES.get(qid_str, ""),
+                "answer_guide": col(row, "Answer Guide"),
+                "revision_note": col(row, "Revision Note on Scorability"),
+                "known_issue":  KNOWN_ISSUES.get(qid, ""),
             })
         wb.close()
         _q_cache = questions
@@ -83,6 +96,11 @@ def parse_questions() -> list:
     except Exception as e:
         print(f"[ERROR] parse_questions: {e}")
         return []
+
+
+def parse_revision_notes() -> list:
+    """Return questions that have a non-empty Revision Note on Scorability."""
+    return [q for q in parse_questions() if q.get("revision_note", "").strip()]
 
 
 def load_comments() -> dict:
@@ -181,6 +199,23 @@ def save_meeting(title: str, date: str, mtype: str, content: str) -> dict:
     return {"ok": True, "slug": slug}
 
 
+def delete_meeting(slug: str) -> dict:
+    import re
+    if not re.match(r'^[a-z0-9-]+$', slug):
+        return {"ok": False, "msg": "Invalid slug"}
+    path = MEETINGS_DIR / f"{slug}.md"
+    if not path.exists():
+        return {"ok": False, "msg": "Meeting note not found"}
+    try:
+        path.unlink()
+    except PermissionError:
+        return {"ok": False, "msg": "Permission denied — cannot delete meeting note"}
+    except OSError as e:
+        print(f"[ERROR] delete_meeting({slug}): {e}")
+        return {"ok": False, "msg": f"Failed to delete meeting note: {e}"}
+    return {"ok": True}
+
+
 def load_kanban() -> dict:
     if not KANBAN_FILE.exists():
         return _default_kanban()
@@ -219,9 +254,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
         p = self.path.split("?")[0]
 
         if p in ("/", "/index.html", ""):
-            self._file(DASHBOARD_HTML)
+            self._file(DELIVERABLES_DIR / "nfl-scorecard-dashboard.html")
+        elif p == "/review":
+            self._file(TOOLS_DIR / "review.html")
+        elif p == "/kanban":
+            self._file(TOOLS_DIR / "kanban.html")
+        elif p == "/changes":
+            self._file(TOOLS_DIR / "changes.html")
         elif p == "/api/questions":
             self._json(parse_questions())
+        elif p == "/api/revision-notes":
+            self._json(parse_revision_notes())
         elif p == "/api/comments":
             self._json(load_comments())
         elif p == "/api/meetings":
@@ -237,6 +280,18 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     return
             self.send_response(404)
             self.end_headers()
+
+    def do_DELETE(self):
+        try:
+            p = self.path.split("?")[0]
+            if p.startswith("/api/meetings/"):
+                slug = p[len("/api/meetings/"):]
+                self._json(delete_meeting(slug))
+            else:
+                self._json({"error": "Not found"}, 404)
+        except Exception as e:
+            print(f"[ERROR] do_DELETE: {e}")
+            self._json({"error": "Internal server error"}, 500)
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
@@ -289,7 +344,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     def _cors(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
     def log_message(self, *_):
@@ -302,21 +357,22 @@ if __name__ == "__main__":
     os.chdir(TOOLS_DIR)
     url = f"http://localhost:{PORT}"
     print(f"\n  NFL Survey Tools")
-    print(f"  ─────────────────────────────")
-    print(f"  Home             →  {url}")
-    print(f"  Question Review  →  {url}/review")
-    print(f"  Kanban Board     →  {url}/kanban")
+    print(f"  -----------------------------")
+    print(f"  Home             ->  {url}")
+    print(f"  Question Review  ->  {url}/review")
+    print(f"  Revision Notes   ->  {url}/changes")
+    print(f"  Kanban Board     ->  {url}/kanban")
     print(f"  Ctrl+C to stop\n")
 
     try:
         import openpyxl  # noqa: F401
     except ImportError:
-        print(f"  ⚠  openpyxl not installed — Question Review will show no questions.")
-        print(f"     Fix: pip install openpyxl\n")
+        print(f"  [!] openpyxl not installed -- Question Review will show no questions.")
+        print(f"      Fix: pip install openpyxl\n")
 
     if not SURVEY_XLSX.exists():
-        print(f"  ⚠  Survey file not found: {SURVEY_XLSX}")
-        print(f"     Question Review will not work until the file is present.\n")
+        print(f"  [!] Survey file not found: {SURVEY_XLSX}")
+        print(f"      Question Review will not work until the file is present.\n")
 
     threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     server = http.server.HTTPServer(("localhost", PORT), Handler)
