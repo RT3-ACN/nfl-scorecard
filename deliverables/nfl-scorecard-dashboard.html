@@ -2286,16 +2286,18 @@ const Review = (() => {
   };
 
   function activate() {
-    if (questions.length) { applyFilter(); return; }
-    fetch(API + '/api/questions').then(r => r.json()).then(qs => {
-      questions = qs;
-      return fetch(API + '/api/comments');
-    }).then(r => r.json()).then(d => {
-      comments = d.comments || {};
-      applyFilter();
-    }).catch(() => {
-      document.getElementById('rq-card').innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:60px">Could not load questions. Is the server running at localhost:9876?</p>';
-    });
+    // Always re-fetch comments so "Your Review" boxes reflect the current saved state
+    const qFetch = questions.length
+      ? Promise.resolve(questions)
+      : fetch(API + '/api/questions').then(r => r.json()).then(qs => { questions = qs; return qs; });
+
+    qFetch
+      .then(() => fetch(API + '/api/comments'))
+      .then(r => r.json())
+      .then(d => { comments = d.comments || {}; applyFilter(); })
+      .catch(() => {
+        document.getElementById('rq-card').innerHTML = '<p style="color:var(--muted);text-align:center;margin-top:60px">Could not load questions. Is the server running at localhost:9876?</p>';
+      });
   }
 
   function applyFilter() {
