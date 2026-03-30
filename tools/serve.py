@@ -134,22 +134,46 @@ def export_to_excel() -> dict:
     if not SURVEY_XLSX.exists():
         return {"ok": False, "msg": f"Survey file not found: {SURVEY_XLSX}"}
     try:
-        comments = load_comments().get("comments", {})
+        today = datetime.date.today().isoformat()
+        data = load_comments()
+        comments = data.get("comments", {})
+        round_num = data.get("meta", {}).get("export_count", 0) + 1
         wb = openpyxl.load_workbook(str(SURVEY_XLSX))
         ws = wb[SURVEY_SHEET]
-        # Header row=1, Question ID=col 3; write review columns at end
-        ws.cell(row=1, column=13, value="Review Comment")
-        ws.cell(row=1, column=14, value="Review Flag")
+        # Find next empty column pair (start after col 12; each round gets its own cols)
+        base_col = 13 + (round_num - 1) * 2
+        ws.cell(row=1, column=base_col,     value=f"Review Comment ({today} R{round_num})")
+        ws.cell(row=1, column=base_col + 1, value=f"Review Flag ({today} R{round_num})")
         for row in range(2, ws.max_row + 1):
             qid = ws.cell(row=row, column=3).value
             if qid and str(qid).strip() in comments:
                 c = comments[str(qid).strip()]
-                ws.cell(row=row, column=13, value=c.get("comment", ""))
-                ws.cell(row=row, column=14, value=c.get("flag", ""))
+                ws.cell(row=row, column=base_col,     value=c.get("comment", ""))
+                ws.cell(row=row, column=base_col + 1, value=c.get("flag", ""))
         wb.save(str(SURVEY_XLSX))
-        return {"ok": True, "file": SURVEY_XLSX.name}
+        # Persist the round counter so next export goes to the next column pair
+        data.setdefault("meta", {})["export_count"] = round_num
+        COMMENTS_FILE.write_text(json.dumps(data, indent=2))
+        return {"ok": True, "file": SURVEY_XLSX.name, "round": round_num}
     except Exception as e:
         return {"ok": False, "msg": str(e)}
+
+
+def reset_comments() -> dict:
+    """Clear all flags and comment text; preserve question IDs and timestamps as history."""
+    data = load_comments()
+    cleared = 0
+    for qid, c in data.get("comments", {}).items():
+        if c.get("flag") or c.get("comment", "").strip():
+            data["comments"][qid] = {
+                "flag":      "",
+                "comment":   "",
+                "timestamp": datetime.datetime.now().isoformat()[:19],
+            }
+            cleared += 1
+    data.setdefault("meta", {})["last_reset"] = datetime.date.today().isoformat()
+    COMMENTS_FILE.write_text(json.dumps(data, indent=2))
+    return {"ok": True, "cleared": cleared}
 
 
 def _parse_frontmatter(content: str):
@@ -307,6 +331,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self._json({"error": str(e)}, 500)
         elif p == "/api/export":
             self._json(export_to_excel())
+        elif p == "/api/comments/reset":
+            self._json(reset_comments())
         elif p == "/api/kanban":
             try:
                 self._json(save_kanban(json.loads(body)))

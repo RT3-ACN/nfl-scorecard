@@ -2500,10 +2500,38 @@ const Review = (() => {
     const btn = document.getElementById('rexport-btn');
     btn.textContent = '⏳ Saving…';
     btn.disabled = true;
-    fetch(API + '/api/export', { method: 'POST' }).then(r => r.json()).then(d => {
-      btn.textContent = d.ok ? '✓ Saved!' : '✗ Error';
-      setTimeout(() => { btn.textContent = '💾 Save to Excel'; btn.disabled = false; }, 2000);
-    }).catch(() => { btn.textContent = '✗ Error'; btn.disabled = false; });
+    fetch(API + '/api/export', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        if (!d.ok) {
+          btn.textContent = '✗ Error';
+          alert('Export failed: ' + (d.msg || 'unknown error'));
+          btn.disabled = false;
+          return;
+        }
+        btn.textContent = `✓ Saved (Round ${d.round})`;
+        // Ask if they want to clear for the next review round
+        const clear = confirm(
+          `Round ${d.round} saved to Excel.\n\n` +
+          `Clear all flags and comments now so the review page is fresh for the next round?\n\n` +
+          `(Your data is safe in the Excel file.)`
+        );
+        if (clear) {
+          fetch(API + '/api/comments/reset', { method: 'POST' })
+            .then(r => r.json())
+            .then(r => {
+              comments = {};
+              applyFilter();
+              updateProgress();
+              btn.textContent = '💾 Save to Excel';
+              btn.disabled = false;
+            })
+            .catch(() => { btn.textContent = '💾 Save to Excel'; btn.disabled = false; });
+        } else {
+          setTimeout(() => { btn.textContent = '💾 Save to Excel'; btn.disabled = false; }, 1500);
+        }
+      })
+      .catch(() => { btn.textContent = '✗ Error'; btn.disabled = false; });
   }
 
   return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote };
