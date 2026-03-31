@@ -1,6 +1,7 @@
 # NFL Stadium Technology Scorecard
-Accenture engagement (ISOW 8, Phase 2) — stadium technology maturity assessment, 4-club pilot.
-Fixed fee $100K. **Client lead:** Gary Brantley (NFL SVP & CIO) | **Accenture lead:** Jon Wakefield (Principal)
+Accenture engagement (ISOW 13 to MSOW) — stadium technology maturity assessment, 3-club validation pilot.
+Fixed fee $100K · **SOW SIGNED 2026-03-30** · Term: Mar 30 – May 11, 2026 · Payment: $50K on signature, $50K on 2026-04-30
+**Client lead:** Gary Brantley (NFL SVP & CIO) | **Day-to-day:** Jon Noble (Dir. Club & Stadium IT) | **Accenture lead:** Jon Wakefield (Principal)
 
 ## Repository Layout
 
@@ -81,7 +82,7 @@ Use `/scoring-design` to build the methodology from the question set. Until that
 6. Survey delivery mechanism: Google Forms → Google Sheets → Tableau pipeline — **Austin + Jordan testing, not confirmed**
 
 ## Confirmed Constraints (2026-03-30 AM Sync)
-- **No client engagement until SOW is signed** — Vik
+- **SOW signed 2026-03-30 — client engagement is now live**
 - **Scoring output = maturity scale 1–5** (numerical) — confirmed by team; full methodology still TBD
 - **Robert reviews all PRs; main branch is stable** — team process decision
 - **Excel in project folder = source of truth for Claude** — Teams used for collaborative edits only

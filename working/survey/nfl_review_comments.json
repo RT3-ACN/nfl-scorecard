@@ -13,24 +13,24 @@
       "timestamp": "2026-03-27T08:57:27"
     },
     "TI_1": {
-      "flag": "revise",
+      "flag": "ok",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-30T14:15:03"
     },
     "TI_2": {
       "flag": "ok",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-30T15:12:55"
     },
     "TI_3": {
       "flag": "revise",
-      "comment": "NFC - Please review answers to make sure that answer \"buckets\" sizing is correct for NFL Stadiums (C should be avg /reasonable/ passable metric)",
-      "timestamp": "2026-03-30T13:01:13"
+      "comment": "",
+      "timestamp": "2026-03-30T15:13:04"
     },
     "TI_4": {
       "flag": "ok",
-      "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "comment": "SHould we consider 4g vs 5g  (we would likely have to split this question out)",
+      "timestamp": "2026-03-30T14:20:57"
     },
     "TI_5": {
       "flag": "ok",
@@ -68,14 +68,14 @@
       "timestamp": "2026-03-30T13:01:13"
     },
     "TI_12": {
-      "flag": "ok",
-      "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "revise",
+      "comment": "Density footprint on seats my be a repeat / we should consider merging",
+      "timestamp": "2026-03-30T14:28:29"
     },
     "TI_13": {
       "flag": "ok",
-      "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "comment": "We should consider merging with question 9.",
+      "timestamp": "2026-03-30T14:43:06"
     },
     "TI_14": {
       "flag": "revise",
