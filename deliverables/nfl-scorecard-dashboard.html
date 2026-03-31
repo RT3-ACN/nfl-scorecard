@@ -2511,11 +2511,11 @@ const Review = (() => {
           btn.disabled = false;
           return;
         }
-        btn.textContent = `✓ Saved (Round ${d.round})`;
+        btn.textContent = `✓ Saved to Excel`;
         // Ask if they want to clear for the next review round
         const clear = confirm(
-          `Round ${d.round} saved to Excel.\n\n` +
-          `Clear all flags and comments now so the review page is fresh for the next round?\n\n` +
+          `Comments saved to Excel (column ${d.col}).\n\n` +
+          `Clear all flags and comments now for a fresh review pass?\n\n` +
           `(Your data is safe in the Excel file.)`
         );
         if (clear) {

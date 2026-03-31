@@ -137,26 +137,48 @@ def export_to_excel() -> dict:
         today = datetime.date.today().isoformat()
         data = load_comments()
         comments = data.get("comments", {})
-        round_num = data.get("meta", {}).get("export_count", 0) + 1
+        reviewer = data.get("meta", {}).get("reviewer", "")
         wb = openpyxl.load_workbook(str(SURVEY_XLSX))
         ws = wb[SURVEY_SHEET]
-        # Find next empty column pair (start after col 12; each round gets its own cols)
-        base_col = 13 + (round_num - 1) * 2
-        ws.cell(row=1, column=base_col,     value=f"Review Comment ({today} R{round_num})")
-        ws.cell(row=1, column=base_col + 1, value=f"Review Flag ({today} R{round_num})")
+        next_col = ws.max_column + 1
+        header = f"Comment - {reviewer} ({today})" if reviewer else f"Comment ({today})"
+        ws.cell(row=1, column=next_col, value=header)
         for row in range(2, ws.max_row + 1):
             qid = ws.cell(row=row, column=3).value
-            if qid and str(qid).strip() in comments:
-                c = comments[str(qid).strip()]
-                ws.cell(row=row, column=base_col,     value=c.get("comment", ""))
-                ws.cell(row=row, column=base_col + 1, value=c.get("flag", ""))
+            if not (qid and str(qid).strip() in comments):
+                continue
+            c = comments[str(qid).strip()]
+            flag    = c.get("flag", "").strip()
+            comment = c.get("comment", "").strip()
+            if flag and comment:
+                cell_val = f"[{flag.upper()}] {comment}"
+            elif flag:
+                cell_val = f"[{flag.upper()}]"
+            else:
+                cell_val = comment
+            if cell_val:
+                ws.cell(row=row, column=next_col, value=cell_val)
         wb.save(str(SURVEY_XLSX))
-        # Persist the round counter so next export goes to the next column pair
-        data.setdefault("meta", {})["export_count"] = round_num
-        COMMENTS_FILE.write_text(json.dumps(data, indent=2))
-        return {"ok": True, "file": SURVEY_XLSX.name, "round": round_num}
+        return {"ok": True, "file": SURVEY_XLSX.name, "col": next_col}
     except Exception as e:
         return {"ok": False, "msg": str(e)}
+
+
+def delete_comment(qid: str) -> dict:
+    data = load_comments()
+    if qid in data.get("comments", {}):
+        del data["comments"][qid]
+        data.setdefault("meta", {})["last_updated"] = datetime.date.today().isoformat()
+        COMMENTS_FILE.write_text(json.dumps(data, indent=2))
+        return {"ok": True}
+    return {"ok": False, "msg": "Comment not found"}
+
+
+def set_reviewer(name: str) -> dict:
+    data = load_comments()
+    data.setdefault("meta", {})["reviewer"] = name.strip()
+    COMMENTS_FILE.write_text(json.dumps(data, indent=2))
+    return {"ok": True}
 
 
 def reset_comments() -> dict:
@@ -312,6 +334,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if p.startswith("/api/meetings/"):
                 slug = p[len("/api/meetings/"):]
                 self._json(delete_meeting(slug))
+            elif p.startswith("/api/comments/"):
+                qid = p[len("/api/comments/"):]
+                self._json(delete_comment(qid))
             else:
                 self._json({"error": "Not found"}, 404)
         except Exception as e:
@@ -333,6 +358,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self._json(export_to_excel())
         elif p == "/api/comments/reset":
             self._json(reset_comments())
+        elif p == "/api/reviewer":
+            try:
+                d = json.loads(body)
+                self._json(set_reviewer(d.get("name", "")))
+            except Exception as e:
+                self._json({"error": str(e)}, 500)
         elif p == "/api/kanban":
             try:
                 self._json(save_kanban(json.loads(body)))
