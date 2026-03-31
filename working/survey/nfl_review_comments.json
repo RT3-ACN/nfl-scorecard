@@ -3,9 +3,8 @@
     "source": "WIP_NFL_Survey_v0.xlsx",
     "created": "2026-03-27",
     "last_updated": "2026-03-31",
-    "export_count": 1,
-    "last_reset": "2026-03-30",
-    "reviewer": ""
+    "export_count": 3,
+    "last_reset": "2026-03-31"
   },
   "comments": {
     "AI_01": {
@@ -13,240 +12,250 @@
       "comment": "",
       "timestamp": "2026-03-27T08:57:27"
     },
-    "TI_3": {
-      "flag": "revise",
+    "TI_1": {
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T13:25:51"
+      "timestamp": "2026-03-31T12:20:45"
+    },
+    "TI_2": {
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
+    },
+    "TI_3": {
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_4": {
-      "flag": "ok",
-      "comment": "SHould we consider 4g vs 5g  (we would likely have to split this question out)",
-      "timestamp": "2026-03-31T13:25:49"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TI_5": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_6": {
-      "flag": "revise",
-      "comment": "NFC - Please review answers to make sure that answer \"buckets\" sizing is correct for NFL Stadiums (C should be avg /reasonable/ passable metric)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_7": {
-      "flag": "revise",
-      "comment": "NFC - Please develop a questions and the rationalized scoring for us and present it for review - (Please review answers to make sure that answer \"buckets\" sizing is correct for NFL Stadiums (C should be avg /reasonable/ passable metric))",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_8": {
-      "flag": "split",
-      "comment": "NFC - This question seems like its mixing service quality and cyber security. I also think we need to tighten this question and potentially separate into 2 ",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_11": {
-      "flag": "revise",
-      "comment": "NFC - We need to rethink how we are asking this question. - think through how team provide a consitant user experience for fans on the wifi? How do was ask that question(s)? How do the prioritieze traffic? ",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_9": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_10": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_12": {
-      "flag": "revise",
-      "comment": "Density footprint on seats my be a repeat / we should consider merging",
-      "timestamp": "2026-03-30T14:28:29"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_13": {
-      "flag": "ok",
-      "comment": "We should consider merging with question 9.",
-      "timestamp": "2026-03-30T14:43:06"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TI_14": {
-      "flag": "revise",
-      "comment": "NFC - We need to refine the response options. this is more of question of how uniform your infrastructure is (have you piece-mealed stuff together over time, or have you designed it with consistent hardware for scalability?)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_1": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_2": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_3": {
-      "flag": "ok",
-      "comment": "NFC - Get rid of caution (this question is good)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "DI_4": {
-      "flag": "revise",
-      "comment": "NFC - Question should be frame more along the lines of do you leverage realtime streaming capabilities enhance fan experience and drive operations. We want to make sure the question/ answer measure streaming capability maturity",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_5": {
-      "flag": "revise",
-      "comment": "NFC - The point of view should be that they are somewhere along the maturity ladder already - answer c is the ground floor, how can we frame the questions different if we assume that c is a min standard",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_6": {
-      "flag": "revise",
-      "comment": "NFC - This question is a bit convoluted and I think we need to simplify it a little bit. That being said it is a good measure of maturity. we need to make sure this scoring logic is tighter with no holes. also if we are multi selectic what happens if user select mono and others?",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_7": {
-      "flag": "revise",
-      "comment": "NFC - please draft the possible responses to this question. We want them to be able to select all the identify access management capabilities that they have. The more the have the higher the score",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_8": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_9": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_10": {
-      "flag": "revise",
-      "comment": "NFC - Please review answers to make sure that answer \"buckets\" sizing is correct for NFL Stadiums (C should be avg /reasonable/ passable metric)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_11": {
-      "flag": "revise",
-      "comment": "NFC - Please review answers to make sure that answer \"buckets\" sizing is correct for NFL Stadiums (C should be avg /reasonable/ passable metric)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_12": {
-      "flag": "revise",
-      "comment": "NFC - do we need Ask this differently? Maybe more like what are you are running on the edge - CDN, ticketing, etc? this would likely be a select all that apply type of question. give me some feedback",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_13": {
-      "flag": "drop",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_14": {
-      "flag": "drop",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T12:20:45"
     },
     "DI_15": {
-      "flag": "drop",
-      "comment": "This may be a question ask during workshops so that we can track the planned development, but not needed in the final survey",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T12:20:45"
     },
     "TS_1": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_2": {
-      "flag": "revise",
-      "comment": "NFC - This method of scoring is good provided that using more of them at the same time is better, is this the case? Or do we need to ask this questions differnt?",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_3": {
-      "flag": "revise",
-      "comment": "NFC - Why would using more POS systems lead to a better score? Having more would likely be a bad thing. This question should be more about how wide spread POS systems are, i.e can I pay for things from my seat, etc., need to make sure scoring is tight",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_4": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_5": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_6": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_7": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_8": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_9": {
-      "flag": "revise",
-      "comment": "NFC - Please review answers to make sure that answer \"buckets\" sizing is correct for Stadiums/venues (C should be avg /reasonable/ passable metric)",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "TS_10": {
-      "flag": "drop",
-      "comment": "This may be a question ask during workshops so that we can track the planned development, but not needed in the final survey",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_1": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_2": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_3": {
-      "flag": "revise",
-      "comment": "NFC - question should be more along the lines of which of the Computer vision do you use during game day",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_4": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_5": {
-      "flag": "revise",
-      "comment": "NFC - question should be more along the lines of which of the Gen AI do you use during game day",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_6": {
       "flag": "",
-      "comment": "This is a useful use case, but how does that relate to evaluating the stadium infra?",
-      "timestamp": "2026-03-30T13:01:13"
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_7": {
-      "flag": "revise",
-      "comment": "NFC - Can we be more detail/ tighter/ descriptive with our answers? We are trying to ask if they have an understanding ofwhere they are going and the investment (capital and time) to get there?",
-      "timestamp": "2026-03-30T13:01:13"
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_8": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_9": {
-      "flag": "ok",
+      "flag": "",
       "comment": "",
-      "timestamp": "2026-03-30T13:01:13"
+      "timestamp": "2026-03-31T11:57:12"
     },
     "AI_10": {
       "flag": "",
-      "comment": "This may be a question ask during workshops so that we can track the planned development, but not needed in the final survey",
-      "timestamp": "2026-03-30T13:01:13"
+      "comment": "",
+      "timestamp": "2026-03-31T11:57:12"
     }
   }
 }
