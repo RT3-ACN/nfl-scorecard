@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'deliverables/nfl-scorecard-dashboard.html'
+  workflow_dispatch:
 
 jobs:
   sync:
