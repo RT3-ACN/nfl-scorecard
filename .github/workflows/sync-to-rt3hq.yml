@@ -1,0 +1,29 @@
+name: Sync dashboard to RT3 HQ
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deliverables/nfl-scorecard-dashboard.html'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout nfl-scorecard
+        uses: actions/checkout@v4
+
+      - name: Push dashboard to rt3hq
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.RT3HQ_SYNC_TOKEN }}
+        with:
+          source_file: 'deliverables/nfl-scorecard-dashboard.html'
+          destination_repo: 'RT3-ACN/rt3hq'
+          destination_folder: 'projects/nfl'
+          destination_branch: 'main'
+          destination_branch_create: 'false'
+          rename: 'index.html'
+          user_email: 'rtreiberiii@gmail.com'
+          user_name: 'RT3 Sync Bot'
+          commit_message: 'sync: nfl dashboard from nfl-scorecard@${{ github.sha }}'
