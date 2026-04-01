@@ -114,3 +114,51 @@ Use `/scoring-design` to build the methodology from the question set. Until that
 - Mobile ordering: 22% higher order value; 80% include alcohol (highest margin)
 - Self-service checkout: 85–170% sales increase across NFL stadiums
 - Dynamic ticket pricing: 5–20% single-game revenue lift
+
+---
+
+## rt3hq Hosted Dashboard — Development Rules
+
+### Architecture
+```
+This repo (OneDrive/NFL/)  →  git push  →  RT3-ACN/nfl-scorecard
+                                                │
+                                          GitHub Actions (~60s)
+                                                │
+                                          RT3-ACN/rt3hq  →  Railway  →  rt3hq.com/nfl
+```
+
+**Three tiers — never mix them:**
+| Tier | What | Where |
+|------|------|--------|
+| Code | Dashboard HTML, scripts, tools | This git repo |
+| Live data | Comments, kanban, meetings | Railway SQLite `/data/nfl.db` |
+| Backups | JSON exports of live data | RT3-ACN/rt3hq-backup (daily) |
+
+### The only deploy command you need
+```bash
+git add deliverables/nfl-scorecard-dashboard.html
+git commit -m "feat: describe what changed"
+git push origin main
+# rt3hq.com/nfl updates automatically within ~90s
+```
+
+### Hard rules
+- **NEVER manually edit `RT3-ACN/rt3hq/projects/nfl/index.html`** — it is always overwritten by the sync action on the next push. Any manual edit will be silently destroyed.
+- **NEVER commit data files**: `nfl_review_comments.json`, any `.db` files, or Excel changes that are data-only. Data lives in Railway, not git.
+- **Always test locally first**: `python3 tools/serve.py` → localhost:9876 — verify the feature works before pushing.
+- **To roll back a bad deploy**: `git revert HEAD && git push` — this is the safe undo.
+
+### The API shim
+The shim at the top of `nfl-scorecard-dashboard.html` bridges the standalone server API to rt3hq's API. It **self-disables on localhost** so the same file works for both local dev and hosted.
+- Do not remove or manually edit the shim
+- To add a new API endpoint to the hosted version: tell Claude "add /api/X to the NFL shim"
+- To rebake the questions (after Excel changes): tell Claude "rebake NFL questions into the shim"
+
+### What to commit vs. not
+| ✅ Commit | ❌ Do NOT commit |
+|-----------|-----------------|
+| `deliverables/nfl-scorecard-dashboard.html` | `working/survey/nfl_review_comments.json` |
+| `tools/serve.py` | Any `.db` files |
+| `scripts/`, `meetings/*.md` | Data-only Excel changes |
+| `.github/workflows/` | `.claude/worktrees/` |

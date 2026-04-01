@@ -51,3 +51,7 @@ working/survey/nfl_question_review.html
 # Node
 node_modules/
 package-lock.json
+
+# Data files — live data lives in Railway, not git
+working/survey/nfl_review_comments.json
+.claude/worktrees/
