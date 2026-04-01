@@ -22,7 +22,6 @@ jobs:
           destination_repo: 'RT3-ACN/rt3hq'
           destination_folder: 'projects/nfl'
           destination_branch: 'main'
-          destination_branch_create: 'false'
           rename: 'index.html'
           user_email: 'rtreiberiii@gmail.com'
           user_name: 'RT3 Sync Bot'
