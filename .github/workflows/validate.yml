@@ -53,15 +53,16 @@ jobs:
             fi
           done
 
-      - name: No Excel files except active survey
+      - name: No Excel files except active surveys
         run: |
           xlsx_files=$(find . -name "*.xlsx" \
             -not -path "./.git/*" \
-            -not -path "./working/survey/WIP_NFL_Survey_v0.xlsx")
+            -not -path "./working/survey/WIP_NFL_Survey_v0.xlsx" \
+            -not -path "./working/survey/WIP_NFL_Survey_v1.xlsx")
           if [[ -n "$xlsx_files" ]]; then
-            echo "❌ Unexpected .xlsx files found (only WIP_NFL_Survey_v0.xlsx allowed):"
+            echo "❌ Unexpected .xlsx files found (only v0 and v1 survey workbooks allowed):"
             echo "$xlsx_files"
             exit 1
           else
-            echo "✅ Only active survey workbook present"
+            echo "✅ Only active survey workbooks present"
           fi

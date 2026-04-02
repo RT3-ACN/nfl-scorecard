@@ -600,6 +600,12 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 }
 </style>
 <script>
+/* ── MAINTENANCE GATE ── self-disables on localhost ── */
+(function(){
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+  document.documentElement.innerHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Temporarily Unavailable — RT3 HQ</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#0f1117;color:#e8eaf0;font-family:'Inter','Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}.card{background:#1a1d27;border:1px solid #2e3248;border-radius:16px;padding:48px 40px;max-width:480px;width:100%}.icon{font-size:48px;margin-bottom:20px}.title{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px}.sub{font-size:14px;color:#9fa8bf;line-height:1.6;margin-bottom:32px}.home-btn{display:inline-block;background:#a100ff;color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;transition:opacity .15s}.home-btn:hover{opacity:.85}.footer{margin-top:24px;font-size:11px;color:#5a6080}</style></head><body><div class="card"><div class="icon">🚧</div><div class="title">Temporarily Unavailable</div><div class="sub">This page is currently offline for maintenance and updates. Check back soon.</div><a class="home-btn" href="/">← Back to RT3 HQ</a><div class="footer">rt3hq.com &nbsp;·&nbsp; If you need access, contact Robert Treiber III</div></div></body></html>`;
+})();
+
 /* ── RT3 HQ API SHIM ── remaps standalone NFL API → rt3hq generic API ──
    Self-disables on localhost — same file works for local dev and hosted.
    To add a new endpoint: add a block here, matching the rt3hq KV/rows API.
