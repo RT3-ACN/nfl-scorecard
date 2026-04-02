@@ -13,7 +13,7 @@ time: 4:32–5:04 PM EST
 ## Discussion
 
 **Checklist-Driven Approach**
-Kieran proposed shifting away from iterating on existing questions and instead building a baseline capability checklist per layer first, then deriving questions from it. Rationale: avoids "meal spinning" (generating questions that don't map to anything real), ensures coverage, and keeps question development grounded in what clubs actually have or don't have.
+Kieran proposed shifting away from iterating on existing questions and instead building a baseline capability checklist per layer first, then deriving questions from it. Rationale: avoids "wheel spinning" (generating questions that don't map to anything real), ensures coverage, and keeps question development grounded in what clubs actually have or don't have.
 
 Reference: Kieran has used this approach before — AI-generated initial list, refined through workshops, irrelevant items deleted. Clean and fast.
 
