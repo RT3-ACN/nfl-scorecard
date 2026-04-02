@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NFL Framework × Survey Tech Tree</title>
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --s2:#22263a; --s3:#2a2e42;
+  --border:#2e3248; --purple:#a100ff; --text:#e8eaf0; --text2:#9fa8bf; --muted:#5a6080;
+  --pre:#3b82f6; --in:#a100ff; --post:#10b981;
+  --ti:#3b82f6; --di:#06b6d4; --ts:#f59e0b; --ai:#c084fc;
+  --fe:#ec4899; --rev:#f59e0b; --cost:#10b981;
+  --gap:rgba(239,68,68,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',sans-serif;font-size:13px;min-height:100vh}
+
+/* ── Header ── */
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200}
+#header h1{font-size:15px;font-weight:800;letter-spacing:-0.01em}
+#header .sub{font-size:11px;color:var(--muted);margin-top:2px}
+#controls{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ctrl-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-right:2px}
+.fb{background:none;border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
+.fb:hover{border-color:var(--purple);color:var(--purple)}
+.fb.on{background:var(--purple);border-color:var(--purple);color:#fff}
+.fb.ti.on{background:var(--ti);border-color:var(--ti);color:#fff}
+.fb.di.on{background:var(--di);border-color:var(--di);color:#fff}
+.fb.ts.on{background:var(--ts);border-color:var(--ts);color:#111}
+.fb.ai.on{background:var(--ai);border-color:var(--ai);color:#fff}
+
+/* ── Main grid ── */
+#main{padding:20px 24px 40px}
+.tree-grid{display:grid;grid-template-columns:210px repeat(4,1fr);gap:1px;min-width:800px}
+
+/* Column headers */
+.col-corner{background:var(--s2);border-radius:6px 0 0 0;display:flex;align-items:center;padding:10px 14px}
+.col-corner span{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.col-hdr{background:var(--s2);padding:10px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;transition:opacity .15s}
+.col-hdr .lname{font-size:14px;font-weight:800;letter-spacing:.02em}
+.col-hdr .lsub{font-size:9px;color:var(--muted);font-weight:500;line-height:1.3;text-align:center}
+.col-hdr .lcount{font-size:9px;font-weight:700;margin-top:2px;opacity:.7}
+.col-hdr.ti .lname{color:var(--ti)} .col-hdr.ti{border-top:3px solid var(--ti)}
+.col-hdr.di .lname{color:var(--di)} .col-hdr.di{border-top:3px solid var(--di)}
+.col-hdr.ts .lname{color:var(--ts)} .col-hdr.ts{border-top:3px solid var(--ts)}
+.col-hdr.ai .lname{color:var(--ai)} .col-hdr.ai{border-top:3px solid var(--ai)}
+
+/* Arrow row */
+.arrow-row{grid-column:1/-1;display:flex;align-items:center;padding:4px 0;gap:1px}
+.arrow-spacer{width:210px;flex-shrink:0}
+.arrow-seg{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--border)}
+.arrow-seg::after{content:'→';font-size:16px}
+.arrow-seg:last-child::after{content:''}
+
+/* Stage separator */
+.stage-sep{grid-column:1/-1;padding:14px 0 6px;display:flex;align-items:center;gap:10px}
+.stage-pill{font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.stage-pill.pre{background:rgba(59,130,246,.15);color:var(--pre);border:1px solid rgba(59,130,246,.3)}
+.stage-pill.in{background:rgba(161,0,255,.15);color:var(--in);border:1px solid rgba(161,0,255,.3)}
+.stage-pill.post{background:rgba(16,185,129,.15);color:var(--post);border:1px solid rgba(16,185,129,.3)}
+.stage-line{flex:1;height:1px;background:var(--border)}
+
+/* Impact separator */
+.impact-sep{grid-column:1/-1;padding:4px 0 2px}
+.impact-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 10px;border-radius:3px;display:inline-block}
+.impact-lbl.fe{background:rgba(236,72,153,.1);color:var(--fe)}
+.impact-lbl.rev{background:rgba(245,158,11,.1);color:var(--rev)}
+.impact-lbl.cost{background:rgba(16,185,129,.1);color:var(--cost)}
+
+/* Value case label cell */
+.vc-label{background:var(--surface);padding:10px 14px;display:flex;flex-direction:column;gap:5px;border-left:3px solid transparent;transition:border-color .15s}
+.vc-label:hover{background:var(--s2)}
+.vc-name{font-size:12px;font-weight:600;line-height:1.3;color:var(--text)}
+.vc-meta{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.vc-cov{font-size:9px;font-weight:700;margin-top:2px}
+.vc-cov.full{color:#10b981} .vc-cov.partial{color:#f59e0b} .vc-cov.gap{color:#ef4444}
+
+/* Question cells */
+.q-cell{background:var(--surface);padding:8px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;min-height:52px;transition:all .12s}
+.q-cell.empty{background:var(--gap)}
+.q-cell.dimmed{opacity:.15;pointer-events:none}
+
+/* Question chips */
+.qchip{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:800;cursor:pointer;border:1px solid transparent;transition:all .1s;white-space:nowrap;letter-spacing:.01em}
+.qchip:hover{transform:translateY(-1px);filter:brightness(1.25);z-index:1;position:relative}
+.qchip.TI{background:rgba(59,130,246,.18);color:#60a5fa;border-color:rgba(59,130,246,.35)}
+.qchip.DI{background:rgba(6,182,212,.18);color:#22d3ee;border-color:rgba(6,182,212,.35)}
+.qchip.TS{background:rgba(245,158,11,.18);color:#fbbf24;border-color:rgba(245,158,11,.35)}
+.qchip.AI{background:rgba(192,132,252,.18);color:#c084fc;border-color:rgba(192,132,252,.35)}
+.qchip.screener{opacity:.55;font-style:italic}
+
+/* Cross-cutting row */
+.cross-row{background:var(--s2);grid-column:1/-1;display:flex;align-items:center;padding:8px 14px;gap:12px;border-top:1px solid var(--border)}
+.cross-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+.cross-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* Tooltip */
+#tt{position:fixed;display:none;background:#1e2235;border:1px solid var(--border);border-radius:8px;padding:12px 14px;max-width:300px;z-index:999;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.55)}
+#tt .tt-id{font-size:11px;font-weight:800;margin-bottom:5px}
+#tt .tt-q{font-size:12px;color:var(--text);line-height:1.55;margin-bottom:8px}
+#tt .tt-change{font-size:10px;margin-bottom:5px}
+#tt .tt-vc{font-size:10px;color:var(--text2);line-height:1.4}
+
+/* Legend */
+#legend{padding:12px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.leg-group{display:flex;gap:8px;align-items:center}
+.leg-lbl{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.gap-ind{width:14px;height:14px;background:var(--gap);border:1px dashed rgba(239,68,68,.3);border-radius:2px;display:inline-block}
+
+/* Coverage summary */
+#summary{padding:10px 24px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;gap:20px;font-size:11px;flex-wrap:wrap}
+.sum-item{display:flex;align-items:center;gap:6px}
+.sum-dot{width:8px;height:8px;border-radius:50%}
+
+/* Impact badge */
+.ibadge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
+.ibadge.fe{background:rgba(236,72,153,.12);color:var(--fe);border:1px solid rgba(236,72,153,.25)}
+.ibadge.rev{background:rgba(245,158,11,.12);color:var(--rev);border:1px solid rgba(245,158,11,.25)}
+.ibadge.cost{background:rgba(16,185,129,.12);color:var(--cost);border:1px solid rgba(16,185,129,.25)}
+
+.sbadge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase}
+.sbadge.pre{background:rgba(59,130,246,.12);color:var(--pre)}
+.sbadge.in{background:rgba(161,0,255,.12);color:var(--in)}
+.sbadge.post{background:rgba(16,185,129,.12);color:var(--post)}
+
+.change-badge{font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;text-transform:uppercase}
+.change-badge.MODIFY{background:rgba(245,158,11,.2);color:#fbbf24}
+.change-badge.NEW{background:rgba(16,185,129,.2);color:#34d399}
+.change-badge.MERGE{background:rgba(59,130,246,.2);color:#60a5fa}
+.change-badge.SPLIT{background:rgba(236,72,153,.2);color:#f472b6}
+.change-badge.KEEP{background:rgba(90,96,128,.2);color:#9fa8bf}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div>
+    <h1>NFL Stadium Technology — Framework × Survey Coverage</h1>
+    <div class="sub">Value Pool Framework V5 × V1 Survey (45 questions) · Tech Layer Progression</div>
+  </div>
+  <div id="controls">
+    <span class="ctrl-lbl">Layer</span>
+    <button class="fb on" data-l="all" onclick="setLayer('all')">All</button>
+    <button class="fb ti" data-l="TI" onclick="setLayer('TI')">TI</button>
+    <button class="fb di" data-l="DI" onclick="setLayer('DI')">DI</button>
+    <button class="fb ts" data-l="TS" onclick="setLayer('TS')">TS</button>
+    <button class="fb ai" data-l="AI" onclick="setLayer('AI')">AI</button>
+  </div>
+</div>
+
+<div id="summary">
+  <div class="sum-item"><div class="sum-dot" style="background:#10b981"></div><span id="sum-full">— full coverage</span></div>
+  <div class="sum-item"><div class="sum-dot" style="background:#f59e0b"></div><span id="sum-partial">— partial coverage</span></div>
+  <div class="sum-item"><div class="sum-dot" style="background:#ef4444"></div><span id="sum-gap">— gap (0 questions)</span></div>
+  <div class="sum-item" style="margin-left:auto"><span id="sum-total" style="color:var(--muted)">Loading…</span></div>
+</div>
+
+<div id="main">
+  <div id="tree" class="tree-grid">
+    <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">Loading questions…</div>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="leg-group"><span class="leg-lbl">Stage</span>
+    <span class="sbadge pre">Pre-Game</span>
+    <span class="sbadge in">In-Game</span>
+    <span class="sbadge post">Post-Game</span>
+  </div>
+  <div class="leg-group"><span class="leg-lbl">Impact</span>
+    <span class="ibadge fe">Fan Exp</span>
+    <span class="ibadge rev">Revenue</span>
+    <span class="ibadge cost">Cost Eff</span>
+  </div>
+  <div class="leg-group"><span class="leg-lbl">Layer</span>
+    <span class="qchip TI">TI_x</span>
+    <span class="qchip DI">DI_x</span>
+    <span class="qchip TS">TS_x</span>
+    <span class="qchip AI">AI_x</span>
+  </div>
+  <div class="leg-group"><span class="leg-lbl">Coverage</span>
+    <div class="gap-ind"></div><span style="font-size:10px;color:var(--muted)">No question for this layer</span>
+  </div>
+</div>
+
+<div id="tt"></div>
+
+<script>
+// ── Framework definition (locked v5) ────────────────────────────────────────
+const FRAMEWORK = [
+  // PRE-GAME
+  { id:'way-pre',  name:'Wayfinding & Navigation',          stage:'pre', impact:'fe',
+    kw:['wayfinding','navigation'] },
+  { id:'entry-fe', name:'Stadium Entry & Scanning',          stage:'pre', impact:'fe',
+    kw:['stadium entry','entry & scanning','entry and scanning','scanning'] },
+  { id:'park-arr', name:'Parking & Arrival',                 stage:'pre', impact:'rev',
+    kw:['parking & arrival','parking and arrival','parking arrival'] },
+  { id:'con-pre',  name:'Concessions Pre-Ordering',          stage:'pre', impact:'rev',
+    kw:['concessions pre-order','pre-order','pre order'] },
+  { id:'ret-pre',  name:'Retail & Merchandise',              stage:'pre', impact:'rev',
+    kw:['retail & merchandise','retail and merchandise','retail & last','last-chance'] },
+  { id:'entry-ce', name:'Stadium Entry & Scanning',          stage:'pre', impact:'cost',
+    kw:['stadium entry','entry & scanning','entry and scanning','scanning'] },
+
+  // IN-GAME
+  { id:'stats',    name:'In-Game Stats & Data Delivery',     stage:'in',  impact:'fe',
+    kw:['in-game stats','stats & data','data delivery','in game stats'] },
+  { id:'way-in',   name:'Wayfinding & Navigation',           stage:'in',  impact:'fe',
+    kw:['wayfinding','navigation'] },
+  { id:'con-in',   name:'Concessions & In-Seat Ordering',    stage:'in',  impact:'rev',
+    kw:['concessions & in-seat','in-seat order','in seat order','concessions and in-seat'] },
+  { id:'ret-in',   name:'Retail & Merchandise',              stage:'in',  impact:'rev',
+    kw:['retail & merchandise','retail and merchandise'] },
+  { id:'adv',      name:'In-Venue Advertising & Sponsorship',stage:'in',  impact:'rev',
+    kw:['advertising','sponsorship','in-venue advert'] },
+  { id:'media',    name:'Media & Broadcast Support',         stage:'in',  impact:'rev',
+    kw:['media & broadcast','broadcast support','broadcast'] },
+  { id:'safe-in',  name:'Safety, Security & Crowd Monitoring',stage:'in', impact:'cost',
+    kw:['safety','security','crowd monitoring'] },
+
+  // POST-GAME
+  { id:'egress',   name:'Wayfinding & Egress Navigation',    stage:'post', impact:'fe',
+    kw:['wayfinding','egress nav','egress navigation'] },
+  { id:'park-eg-fe',name:'Parking & Egress',                 stage:'post', impact:'fe',
+    kw:['parking & egress','parking egress','parking and egress'] },
+  { id:'ret-post', name:'Retail & Last-Chance Merchandise',  stage:'post', impact:'rev',
+    kw:['retail','last-chance','last chance','merchandise'] },
+  { id:'safe-post',name:'Safety, Security & Crowd Monitoring',stage:'post',impact:'cost',
+    kw:['safety','security','crowd monitoring'] },
+  { id:'park-eg-ce',name:'Parking & Egress',                 stage:'post', impact:'cost',
+    kw:['parking & egress','parking egress','parking and egress'] },
+];
+
+const STAGES    = ['pre','in','post'];
+const STAGE_LBL = { pre:'Pre-Game', in:'In-Game', post:'Post-Game' };
+const IMPACTS   = ['fe','rev','cost'];
+const IMP_LBL   = { fe:'Fan Experience', rev:'Revenue Generation', cost:'Cost Efficiency' };
+const LAYERS    = [
+  { id:'TI', full:'Technology Infrastructure' },
+  { id:'DI', full:'Digital Infrastructure' },
+  { id:'TS', full:'Technology Services' },
+  { id:'AI', full:'AI & Innovation' },
+];
+
+let allQ = [];
+let activeLayer = 'all';
+
+function matchesVC(q, vc) {
+  const raw = (q.value_cases || '').toLowerCase();
+  if (!raw) return false;
+  if (raw.includes('all value cases') || raw.includes('all ai-dependent')) return true;
+  return vc.kw.some(k => raw.includes(k.toLowerCase()));
+}
+
+function getQ(vcId, layerId) {
+  const vc = FRAMEWORK.find(v => v.id === vcId);
+  if (!vc) return [];
+  return allQ.filter(q => {
+    const layer = q.id.split('_')[0];
+    return layer === layerId && matchesVC(q, vc);
+  });
+}
+
+function getScreeners() {
+  return allQ.filter(q => {
+    const raw = (q.value_cases || '').toLowerCase();
+    return raw.includes('all value cases') || raw.includes('all ai-dependent');
+  });
+}
+
+function setLayer(l) {
+  activeLayer = l;
+  document.querySelectorAll('.fb[data-l]').forEach(b => {
+    b.classList.toggle('on', b.dataset.l === l);
+  });
+  render();
+}
+
+function chipHTML(q) {
+  const layer = q.id.split('_')[0];
+  const isScreener = (q.value_cases||'').toLowerCase().includes('all');
+  return `<span class="qchip ${layer}${isScreener?' screener':''}"
+    onmouseenter="showTT(event,'${q.id}')" onmouseleave="hideTT()"
+  >${q.id}</span>`;
+}
+
+function render() {
+  const tree = document.getElementById('tree');
+
+  // Count coverage for summary
+  let fullC=0, partialC=0, gapC=0;
+  FRAMEWORK.forEach(vc => {
+    const layerCounts = LAYERS.filter(l => getQ(vc.id, l.id).length > 0).length;
+    if (layerCounts === 4) fullC++;
+    else if (layerCounts >= 1) partialC++;
+    else gapC++;
+  });
+  document.getElementById('sum-full').textContent    = `${fullC} value cases — full coverage (all 4 layers)`;
+  document.getElementById('sum-partial').textContent = `${partialC} value cases — partial coverage`;
+  document.getElementById('sum-gap').textContent     = `${gapC} value cases — gap (no questions in ≥1 layer)`;
+  document.getElementById('sum-total').textContent   = `${allQ.length} questions · ${FRAMEWORK.length} value case instances · ${[...new Set(FRAMEWORK.map(v=>v.name))].length} unique value cases`;
+
+  let html = '';
+
+  // Column headers
+  html += `<div class="col-corner"><span>Value Case</span></div>`;
+  LAYERS.forEach(l => {
+    const qCount = allQ.filter(q => q.id.split('_')[0] === l.id).length;
+    const dim = activeLayer !== 'all' && activeLayer !== l.id;
+    html += `<div class="col-hdr ${l.id.toLowerCase()}" style="${dim?'opacity:.3':''}">
+      <div class="lname">${l.id}</div>
+      <div class="lsub">${l.full}</div>
+      <div class="lcount">${qCount} questions</div>
+    </div>`;
+  });
+
+  // Arrow progression row
+  html += `<div class="arrow-row">
+    <div class="arrow-spacer"></div>
+    <div class="arrow-seg">Infrastructure</div>
+    <div class="arrow-seg">Digital</div>
+    <div class="arrow-seg">Services</div>
+    <div class="arrow-seg" style="justify-content:flex-start;padding-left:12px">Intelligence</div>
+  </div>`;
+
+  // Cross-cutting screeners
+  const screeners = getScreeners();
+  if (screeners.length) {
+    html += `<div class="cross-row">
+      <div class="cross-lbl">Cross-cutting / Screeners</div>
+      <div class="cross-chips">
+        ${screeners.map(chipHTML).join('')}
+        <span style="font-size:10px;color:var(--muted);margin-left:4px">— apply across all value cases</span>
+      </div>
+    </div>`;
+  }
+
+  // Stages
+  STAGES.forEach(stage => {
+    html += `<div class="stage-sep">
+      <span class="stage-pill ${stage}">${STAGE_LBL[stage]}</span>
+      <div class="stage-line"></div>
+    </div>`;
+
+    IMPACTS.forEach(impact => {
+      const vcs = FRAMEWORK.filter(v => v.stage === stage && v.impact === impact);
+      if (!vcs.length) return;
+
+      html += `<div class="impact-sep"><span class="impact-lbl ${impact}">${IMP_LBL[impact]}</span></div>`;
+
+      vcs.forEach(vc => {
+        const layerQs = LAYERS.map(l => getQ(vc.id, l.id));
+        const covCount = layerQs.filter(lq => lq.length > 0).length;
+        const covClass = covCount === 4 ? 'full' : covCount >= 1 ? 'partial' : 'gap';
+        const borderColor = {fe:'var(--fe)',rev:'var(--rev)',cost:'var(--cost)'}[impact];
+
+        html += `<div class="vc-label" style="border-left-color:${borderColor}">
+          <div class="vc-name">${vc.name}</div>
+          <div class="vc-meta">
+            <span class="sbadge ${stage}">${STAGE_LBL[stage]}</span>
+            <span class="ibadge ${impact}">${IMP_LBL[impact]}</span>
+          </div>
+          <div class="vc-cov ${covClass}">${covCount}/4 layers covered</div>
+        </div>`;
+
+        layerQs.forEach((lqs, li) => {
+          const lid = LAYERS[li].id;
+          const dimmed = activeLayer !== 'all' && activeLayer !== lid;
+          const isEmpty = lqs.length === 0 && !dimmed;
+          html += `<div class="q-cell${isEmpty?' empty':''}${dimmed?' dimmed':''}">`;
+          if (!dimmed) lqs.forEach(q => { html += chipHTML(q); });
+          html += '</div>';
+        });
+      });
+    });
+  });
+
+  tree.innerHTML = html;
+}
+
+const ttEl = document.getElementById('tt');
+function showTT(e, qid) {
+  const q = allQ.find(x => x.id === qid);
+  if (!q) return;
+  const layer = qid.split('_')[0];
+  const ct = q.change_type || '';
+  ttEl.innerHTML = `
+    <div class="tt-id"><span class="qchip ${layer}" style="pointer-events:none">${q.id}</span>
+      ${ct ? `<span class="change-badge ${ct}" style="margin-left:6px">${ct}</span>` : ''}
+    </div>
+    <div class="tt-q">${q.question}</div>
+    ${q.value_cases ? `<div class="tt-vc"><b style="color:var(--text2)">Value cases:</b> ${q.value_cases.slice(0,150)}${q.value_cases.length>150?'…':''}</div>` : ''}
+    ${q.change_notes ? `<div class="tt-vc" style="margin-top:6px;color:var(--muted)">${q.change_notes.slice(0,120)}${q.change_notes.length>120?'…':''}</div>` : ''}
+  `;
+  ttEl.style.display = 'block';
+  const x = Math.min(e.clientX + 14, window.innerWidth - 320);
+  const y = Math.min(e.clientY - 10, window.innerHeight - 180);
+  ttEl.style.left = x + 'px';
+  ttEl.style.top  = y + 'px';
+}
+function hideTT() { ttEl.style.display = 'none'; }
+
+// Load questions
+fetch('/api/questions?v=1')
+  .then(r => r.json())
+  .then(qs => {
+    // Filter out cross-cutting screeners from matrix but keep for separate display
+    allQ = qs;
+    render();
+  })
+  .catch(() => {
+    document.getElementById('tree').innerHTML =
+      '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">Could not load questions. Is the server running at localhost:9876?</div>';
+  });
+</script>
+</body>
+</html>

@@ -21,6 +21,8 @@ NFL_DIR        = TOOLS_DIR.parent
 DELIVERABLES_DIR = NFL_DIR / "deliverables"
 SURVEY_DIR     = NFL_DIR / "working" / "survey"
 SURVEY_XLSX    = SURVEY_DIR / "WIP_NFL_Survey_v0.xlsx"
+SURVEY_XLSX_V1 = SURVEY_DIR / "WIP_NFL_Survey_v1.xlsx"
+SURVEY_SHEET_V1 = "V1 Survey Questions"
 COMMENTS_FILE  = SURVEY_DIR / "nfl_review_comments.json"
 KANBAN_FILE    = TOOLS_DIR / "kanban-state.json"
 DASHBOARD_HTML = DELIVERABLES_DIR / "nfl-scorecard-dashboard.html"
@@ -42,23 +44,32 @@ MIME = {
     ".ico":  "image/x-icon",
 }
 
-_q_cache = None
-_q_mtime = 0.0
+_q_cache    = None
+_q_mtime    = 0.0
+_q_cache_v1 = None
+_q_mtime_v1 = 0.0
 
 
 # ── DATA FUNCTIONS ─────────────────────────────────────────────────────────────
 
-def parse_questions() -> list:
-    global _q_cache, _q_mtime
-    if not SURVEY_XLSX.exists():
+def parse_questions(version: str = "v0") -> list:
+    global _q_cache, _q_mtime, _q_cache_v1, _q_mtime_v1
+
+    is_v1   = version == "v1"
+    xlsx    = SURVEY_XLSX_V1 if is_v1 else SURVEY_XLSX
+    sheet   = SURVEY_SHEET_V1 if is_v1 else SURVEY_SHEET
+    cache   = _q_cache_v1 if is_v1 else _q_cache
+    mtime_c = _q_mtime_v1 if is_v1 else _q_mtime
+
+    if not xlsx.exists():
         return []
     try:
-        mtime = SURVEY_XLSX.stat().st_mtime
-        if _q_cache is not None and mtime == _q_mtime:
-            return _q_cache
+        mtime = xlsx.stat().st_mtime
+        if cache is not None and mtime == mtime_c:
+            return cache
         import openpyxl
-        wb = openpyxl.load_workbook(str(SURVEY_XLSX), data_only=True)
-        ws = wb[SURVEY_SHEET]
+        wb = openpyxl.load_workbook(str(xlsx), data_only=True)
+        ws = wb[sheet]
         rows = list(ws.iter_rows(values_only=True))
         headers = [str(c).strip() if c else "" for c in rows[0]]
 
@@ -76,25 +87,36 @@ def parse_questions() -> list:
                 continue
             opts_raw = col(row, "Answer Options Definitions")
             opts = [o.strip() for o in opts_raw.split("|") if o.strip()] if opts_raw else []
-            questions.append({
-                "id":           qid,
-                "category":     col(row, "Survey Category"),
-                "domain":       col(row, "Domain Covered"),
-                "question":     col(row, "Question"),
-                "guide":        col(row, "Guide Explanation"),
-                "format":       col(row, "Answer Format"),
-                "style":        col(row, "Answer Options Style"),
-                "options":      opts,
-                "answer_guide": col(row, "Answer Guide"),
+            q = {
+                "id":            qid,
+                "category":      col(row, "Survey Category"),
+                "domain":        col(row, "Domain Covered"),
+                "question":      col(row, "Question"),
+                "guide":         col(row, "Guide Explanation"),
+                "format":        col(row, "Answer Format"),
+                "style":         col(row, "Answer Options Style"),
+                "options":       opts,
+                "answer_guide":  col(row, "Answer Guide"),
                 "revision_note": col(row, "Revision Note on Scorability"),
-                "known_issue":  KNOWN_ISSUES.get(qid, ""),
-            })
+                "known_issue":   KNOWN_ISSUES.get(qid, ""),
+            }
+            if is_v1:
+                q["v0_ref"]       = col(row, "V0_Reference")
+                q["change_type"]  = col(row, "Change_Type")
+                q["value_cases"]  = col(row, "Value_Cases")
+                q["change_notes"] = col(row, "Change_Notes")
+            questions.append(q)
         wb.close()
-        _q_cache = questions
-        _q_mtime = mtime
+
+        if is_v1:
+            _q_cache_v1 = questions
+            _q_mtime_v1 = mtime
+        else:
+            _q_cache = questions
+            _q_mtime = mtime
         return questions
     except Exception as e:
-        print(f"[ERROR] parse_questions: {e}")
+        print(f"[ERROR] parse_questions(v={version}): {e}")
         return []
 
 
@@ -309,7 +331,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif p == "/changes":
             self._file(TOOLS_DIR / "changes.html")
         elif p == "/api/questions":
-            self._json(parse_questions())
+            qs  = self.path.split("?")[1] if "?" in self.path else ""
+            ver = "v1" if "v=1" in qs else "v0"
+            self._json(parse_questions(ver))
         elif p == "/api/revision-notes":
             self._json(parse_revision_notes())
         elif p == "/api/comments":

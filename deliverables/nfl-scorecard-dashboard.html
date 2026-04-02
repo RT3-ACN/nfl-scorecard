@@ -398,6 +398,9 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 #review-filter-row .fl { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
 #rfocus-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
 #meetings-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
+#framework-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
+#framework-view.active { display: flex; }
+#framework-iframe { flex: 1; border: none; width: 100%; background: #0f1117; }
 #meetings-view.active { display: flex; }
 #changes-view { display: none; flex-direction: column; height: 100vh; overflow: hidden; flex: 1; min-width: 0; }
 #changes-view.active { display: flex; }
@@ -507,6 +510,27 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 .rflag-chip.revise { background: var(--yellow-bg); color: var(--yellow); }
 .rflag-chip.split  { background: var(--blue-bg);   color: var(--blue);   }
 .rflag-chip.drop   { background: var(--red-bg);    color: var(--red);    }
+
+/* ── VERSION TOGGLE ──────────────────────────────────── */
+#rver-toggle { display:flex; background:var(--surface2); border:1px solid var(--border); border-radius:6px; overflow:hidden; flex-shrink:0; }
+.rver-btn { background:none; border:none; color:var(--text2); padding:4px 13px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.12s; letter-spacing:0.04em; }
+.rver-btn.on { background:var(--purple); color:#fff; }
+
+/* ── CHANGE BADGES ───────────────────────────────────── */
+.rchange-badge { padding:1px 7px; border-radius:4px; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; flex-shrink:0; }
+.rchange-new    { background:rgba(0,229,255,.15);  color:#00e5ff; }
+.rchange-modify { background:rgba(255,241,118,.12); color:#fff176; }
+.rchange-merge  { background:rgba(206,147,216,.15); color:#ce93d8; }
+.rchange-split  { background:rgba(99,102,241,.15); color:var(--blue); }
+.rchange-keep   { background:var(--surface3); color:var(--muted); }
+.rv0ref-tag { font-size:10px; color:var(--muted); margin-bottom:12px; }
+.rv0ref-tag b { color:var(--text2); font-weight:600; }
+.rvcases-block { background:rgba(0,180,255,.06); border:1px solid rgba(0,180,255,.15); border-radius:6px; padding:8px 12px; margin-bottom:12px; }
+.rvcases-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:rgba(0,180,255,.7); margin-bottom:3px; }
+.rvcases-txt { font-size:11px; color:#7ecfff; line-height:1.5; }
+.rcnotes-block { background:rgba(255,241,118,.05); border:1px solid rgba(255,241,118,.12); border-radius:6px; padding:8px 12px; margin-bottom:12px; }
+.rcnotes-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:rgba(255,241,118,.6); margin-bottom:3px; }
+.rcnotes-txt { font-size:11px; color:var(--text2); line-height:1.5; font-family:'SF Mono',Consolas,monospace; }
 .rflag-chip.none   { background: var(--surface3);  color: var(--muted);  }
 .rissuedot { width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; flex: 0 0 5px; }
 .rcaret { font-size: 9px; color: var(--muted); transition: transform 0.18s; flex: 0 0 auto; }
@@ -724,6 +748,7 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
     <div class="sb-label">Tools</div>
     <div class="nav-item" id="nav-board" onclick="showView('board')"><span class="nav-icon">🗂️</span> Board</div>
     <div class="nav-item" id="nav-review" onclick="showView('review')"><span class="nav-icon">📋</span> Question Review</div>
+    <div class="nav-item" id="nav-framework" onclick="showView('framework')"><span class="nav-icon">🌐</span> Framework Tree</div>
     <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📅</span> Meeting Notes</div>
   </div>
   <div class="sb-section">
@@ -770,6 +795,11 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
     <span id="reviewer-saved-lbl" style="font-size:11px;color:var(--green);opacity:0;transition:opacity 0.3s;">Saved ✓</span>
   </div>
   <div id="review-topbar">
+    <div id="rver-toggle">
+      <button class="rver-btn on" id="rver-v0" onclick="Review.setVersion('v0')">V0</button>
+      <button class="rver-btn"    id="rver-v1" onclick="Review.setVersion('v1')">V1</button>
+    </div>
+    <div class="btdiv"></div>
     <div id="rmode-toggle">
       <button class="rmode-btn on" id="rmode-focus" onclick="Review.setMode('focus')">Focus</button>
       <button class="rmode-btn" id="rmode-list"  onclick="Review.setMode('list')">List</button>
@@ -843,6 +873,11 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
       <button id="note-save-btn" onclick="Meetings.saveNote()" style="background:var(--blue);border:none;color:#fff;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Save Note</button>
     </div>
   </div>
+</div>
+
+<!-- FRAMEWORK TREE VIEW -->
+<div id="framework-view">
+  <iframe id="framework-iframe" src="/framework-tree.html" title="Framework × Survey Coverage Tree"></iframe>
 </div>
 
 <!-- MEETINGS VIEW -->
@@ -2460,21 +2495,33 @@ const Review = (() => {
   const API = '';
   let questions = [], comments = {}, history = [], filtered = [], idx = 0;
   let mode = 'focus', fLayer = 'all', fStatus = 'all', hasNoteFilter = false;
+  let activeVersion = 'v0', questionsV1 = [];
 
   const KNOWN_ISSUES = {
     'TS_01': 'Must address concessionaire-managed POS scenario',
   };
 
   function activate() {
-    const qFetch = questions.length
-      ? Promise.resolve(questions)
-      : fetch(API + '/api/questions').then(r => r.json()).then(qs => { questions = qs; return qs; });
+    const isV1 = activeVersion === 'v1';
+    const cache = isV1 ? questionsV1 : questions;
+    const qUrl  = isV1 ? API + '/api/questions?v=1' : API + '/api/questions';
+
+    const qFetch = cache.length
+      ? Promise.resolve(cache)
+      : fetch(qUrl).then(r => r.json()).then(qs => {
+          if (isV1) questionsV1 = qs; else questions = qs;
+          return qs;
+        });
 
     qFetch
-      .then(() => Promise.all([
-        fetch(API + '/api/comments').then(r => r.json()),
-        fetch(API + '/api/history').then(r => r.json()),
-      ]))
+      .then(qs => {
+        // Assign to the active questions list for filtering
+        if (isV1) questionsV1 = qs; else questions = qs;
+        return Promise.all([
+          fetch(API + '/api/comments').then(r => r.json()),
+          fetch(API + '/api/history').then(r => r.ok ? r.json() : {reviews: []}),
+        ]);
+      })
       .then(([cd, hd]) => {
         comments = cd.comments || {};
         history  = hd.reviews  || [];
@@ -2487,8 +2534,21 @@ const Review = (() => {
       });
   }
 
+  function setVersion(v) {
+    activeVersion = v;
+    document.getElementById('rver-v0').classList.toggle('on', v === 'v0');
+    document.getElementById('rver-v1').classList.toggle('on', v === 'v1');
+    // Reset filters
+    fLayer = 'all'; fStatus = 'all'; hasNoteFilter = false; idx = 0;
+    updateFilters();
+    const el = document.getElementById('rfilt-hasnote');
+    if (el) el.classList.remove('on');
+    activate();
+  }
+
   function applyFilter() {
-    filtered = questions.filter(q => {
+    const activeQ = activeVersion === 'v1' ? questionsV1 : questions;
+    filtered = activeQ.filter(q => {
       const layer = q.id.split('_')[0];
       if (fLayer !== 'all' && layer !== fLayer) return false;
       if (hasNoteFilter && !q.revision_note?.trim()) return false;
@@ -2515,8 +2575,9 @@ const Review = (() => {
   }
 
   function updateProgress() {
-    const reviewed = questions.filter(q => comments[q.id]?.flag).length;
-    const total = questions.length;
+    const activeQ = activeVersion === 'v1' ? questionsV1 : questions;
+    const reviewed = activeQ.filter(q => comments[q.id]?.flag).length;
+    const total = activeQ.length;
     document.getElementById('rprogress-text').textContent = `${reviewed} / ${total} reviewed`;
     document.getElementById('rprogress-fill').style.width = total ? (reviewed/total*100)+'%' : '0%';
   }
@@ -2563,13 +2624,24 @@ const Review = (() => {
           ${hComment ? `<div class="rrt3-txt" style="color:var(--text2)">${hComment}</div>` : ''}
         </div>`;
     }).join('');
+    // V1-only metadata
+    const changeBadge = q.change_type
+      ? `<span class="rchange-badge rchange-${q.change_type.toLowerCase()}">${q.change_type}</span>` : '';
+    const v0refTag = q.v0_ref
+      ? `<span class="rv0ref-tag">← ${q.v0_ref}</span>` : '';
+    const vcasesBlock = q.value_cases
+      ? `<div class="rvcases-block"><span class="rvcases-lbl">Value Cases</span>${q.value_cases}</div>` : '';
+    const cnotesBlock = q.change_notes
+      ? `<div class="rcnotes-block"><span class="rcnotes-lbl">Change Notes</span>${q.change_notes}</div>` : '';
 
     return `
       <div class="rq-meta">
         <span class="rq-badge ${layer}">${layer}</span>
         <span class="rq-qid">${q.id}</span>
+        ${changeBadge}
         <span class="rq-domain">${q.domain}</span>
       </div>
+      ${v0refTag}
       ${issue ? `<div class="rq-issue">⚠ ${issue}</div>` : ''}
       <div class="rq-slbl">Question</div>
       <div class="rq-text">${q.question}</div>
@@ -2582,6 +2654,8 @@ const Review = (() => {
       </div>
       ${q.guide ? `<div class="rq-slbl">Guide</div><div class="rq-guide">${q.guide}</div>` : ''}
       ${q.answer_guide ? `<div class="rq-slbl">Answer guide</div><div class="rq-aguide">${q.answer_guide}</div>` : ''}
+      ${vcasesBlock}
+      ${cnotesBlock}
       <div class="rq-divider"></div>
       <div class="rflag-row">${flagBtns}</div>
       <textarea class="rq-comment" data-qid="${q.id}" placeholder="Add comment or concern…">${c.comment||''}</textarea>
@@ -2619,11 +2693,14 @@ const Review = (() => {
         const icon = {good:'✓',revise:'⚠',drop:'✕',claude:'→'}[t] || '📝';
         return `<span class="rrev-chip ${t}">${icon} ${t}</span>`;
       })() : '';
+      const changeChip = q.change_type
+        ? `<span class="rchange-badge rchange-${q.change_type.toLowerCase()}" style="margin-left:6px">${q.change_type}</span>` : '';
       return `
         <div class="rlist-card" id="rlist-${q.id}">
           <div class="rlist-hdr" onclick="Review.toggleListItem('${q.id}')">
             <span class="rq-badge ${layer}" style="flex-shrink:0">${layer}</span>
             <span style="font-weight:700;font-size:12px;margin-left:6px">${q.id}</span>
+            ${changeChip}
             <span style="font-size:12px;color:var(--text2);margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.question.slice(0,80)}${q.question.length>80?'…':''}</span>
             ${revNoteChip}
             ${chipHtml}
@@ -2751,7 +2828,7 @@ const Review = (() => {
     }).catch(() => {});
   }
 
-  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote, deleteComment, saveReviewer };
+  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote, deleteComment, saveReviewer, setVersion };
 })();
 
 // ── Meetings module ───────────────────────────────────────────────────────────
@@ -2909,12 +2986,14 @@ function showView(view) {
   const boardView = document.getElementById('board-view');
   const reviewView = document.getElementById('review-view');
   const meetingsView = document.getElementById('meetings-view');
-  const ids = ['nav-overview','nav-board','nav-review','nav-meetings'];
+  const frameworkView = document.getElementById('framework-view');
+  const ids = ['nav-overview','nav-board','nav-review','nav-framework','nav-meetings'];
 
   main.style.display = 'none';
   boardView.classList.remove('active');
   reviewView.classList.remove('active');
   meetingsView.classList.remove('active');
+  frameworkView.classList.remove('active');
   ids.forEach(id => { const el = document.getElementById(id); el && el.classList.remove('active'); });
 
   if (view === 'board') {
@@ -2925,6 +3004,9 @@ function showView(view) {
     reviewView.classList.add('active');
     document.getElementById('nav-review')?.classList.add('active');
     Review.activate();
+  } else if (view === 'framework') {
+    frameworkView.classList.add('active');
+    document.getElementById('nav-framework')?.classList.add('active');
   } else if (view === 'meetings') {
     meetingsView.classList.add('active');
     document.getElementById('nav-meetings')?.classList.add('active');

@@ -25,7 +25,50 @@
   --revise: #ffa726;
   --split:  #42a5f5;
   --drop:   #ef5350;
+
+  --new:    #00e5ff;
+  --merge:  #ce93d8;
+  --modify: #fff176;
+  --keep:   #66668a;
 }
+
+/* ── VERSION TOGGLE ────────────────────────────────────── */
+.ver-toggle {
+  display: flex;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.ver-btn {
+  background: none; border: none;
+  color: var(--muted);
+  padding: 5px 14px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.ver-btn.active { background: var(--purple); color: #fff; }
+
+/* ── CHANGE BADGES ─────────────────────────────────────── */
+.change-badge {
+  padding: 2px 8px; border-radius: 5px;
+  font-size: 9px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  flex: 0 0 auto;
+}
+.change-new    { background: rgba(0,229,255,.15);  color: var(--new);    }
+.change-modify { background: rgba(255,241,118,.12); color: var(--modify); }
+.change-merge  { background: rgba(206,147,216,.15); color: var(--merge);  }
+.change-split  { background: rgba(66,165,245,.15);  color: var(--split);  }
+.change-keep   { background: rgba(102,102,138,.1);  color: var(--keep);   }
+
+.v0ref-tag {
+  font-size: 10px; color: var(--muted);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 5px;
+}
+.v0ref-tag span { color: var(--text); font-weight: 600; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -324,6 +367,10 @@ kbd {
   <a href="/" style="color:var(--muted);font-size:12px;text-decoration:none;flex:0 0 auto">🏈 NFL Tools</a>
   <span style="color:var(--muted2);font-size:12px">›</span>
   <div id="header-title">NFL <em>Question Review</em></div>
+  <div class="ver-toggle">
+    <button class="ver-btn active" id="ver-v0" onclick="setVersion('v0')">V0</button>
+    <button class="ver-btn"        id="ver-v1" onclick="setVersion('v1')">V1</button>
+  </div>
   <div class="mode-toggle">
     <button class="mode-btn active" onclick="setMode('focus')">Focus</button>
     <button class="mode-btn"        onclick="setMode('list')">List</button>
@@ -388,19 +435,21 @@ kbd {
 const API = '';
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let questions = [];
-let comments  = {};          // { qid: { flag, comment, timestamp } }
-let filtered  = [];
-let idx       = 0;           // current index in filtered[] (focus mode)
-let mode      = 'focus';
-let fLayer    = 'all';
-let fStatus   = 'all';
+let questions      = [];
+let comments       = {};     // { qid: { flag, comment, timestamp } }
+let filtered       = [];
+let idx            = 0;      // current index in filtered[] (focus mode)
+let mode           = 'focus';
+let fLayer         = 'all';
+let fStatus        = 'all';
+let activeVersion  = 'v0';
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
+    const qUrl = activeVersion === 'v1' ? `${API}/api/questions?v=1` : `${API}/api/questions`;
     const [qr, cr] = await Promise.all([
-      fetch(`${API}/api/questions`),
+      fetch(qUrl),
       fetch(`${API}/api/comments`),
     ]);
     questions = await qr.json();
@@ -408,12 +457,25 @@ async function init() {
     comments  = cdata.comments || {};
     const savedName = cdata.meta?.reviewer || '';
     if (savedName) document.getElementById('reviewer-input').value = savedName;
+    idx = 0;
     applyFilter();
     updateProgress();
   } catch (e) {
     document.getElementById('focus-card').innerHTML =
-      `<div class="empty">Error: ${e.message}<br><small>Make sure the RT3 dashboard server is running on port 7337.</small></div>`;
+      `<div class="empty">Error: ${e.message}<br><small>Make sure the server is running on port 9876.</small></div>`;
   }
+}
+
+// ── VERSION TOGGLE ────────────────────────────────────────────────────────────
+function setVersion(v) {
+  activeVersion = v;
+  document.getElementById('ver-v0').classList.toggle('active', v === 'v0');
+  document.getElementById('ver-v1').classList.toggle('active', v === 'v1');
+  // Reset filters when switching versions
+  fLayer = 'all'; fStatus = 'all';
+  document.querySelectorAll('[data-layer]').forEach(b  => b.classList.toggle('active', b.dataset.layer  === 'all'));
+  document.querySelectorAll('[data-status]').forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
+  init();
 }
 
 // ── FILTER ────────────────────────────────────────────────────────────────────
@@ -471,6 +533,19 @@ function buildCardHTML(q, c, isFocus) {
   const options  = (q.options || []).filter(Boolean);
 
   const badge    = `<span class="layer-badge badge-${layer}">${layer}</span>`;
+  const ct       = (q.change_type || '').toLowerCase();
+  const changeBadge = ct && ct !== 'keep'
+    ? `<span class="change-badge change-${ct}">${esc(q.change_type)}</span>`
+    : (ct === 'keep' ? `<span class="change-badge change-keep">KEEP</span>` : '');
+  const v0ref    = q.v0_ref && q.v0_ref !== q.id
+    ? `<div class="v0ref-tag">V0: <span>${esc(q.v0_ref)}</span></div>`
+    : '';
+  const vcases   = q.value_cases
+    ? `<div class="guide-block"><div class="section-lbl">Value Cases</div><div class="guide-text" style="color:#7ecfff">${esc(q.value_cases)}</div></div>`
+    : '';
+  const cnotes   = q.change_notes
+    ? `<div class="guide-block"><div class="section-lbl">Change Notes (V0 → V1)</div><div class="answerguide-text">${esc(q.change_notes)}</div></div>`
+    : '';
   const issue    = q.known_issue
     ? `<div class="issue-banner">⚠️ <strong>Known issue:</strong> ${esc(q.known_issue)}</div>`
     : '';
@@ -497,8 +572,10 @@ function buildCardHTML(q, c, isFocus) {
     <div class="card-meta">
       ${badge}
       <span class="card-qid">${esc(q.id)}</span>
+      ${changeBadge}
       <span class="card-domain">${esc(q.domain)}</span>
     </div>
+    ${v0ref}
     ${issue}
     <div class="section-lbl">Question</div>
     <div class="question-text">${esc(q.question)}</div>
@@ -516,6 +593,8 @@ function buildCardHTML(q, c, isFocus) {
       <div class="section-lbl">Answer Guide</div>
       <div class="answerguide-text">${esc(q.answer_guide)}</div>
     </div>` : ''}
+    ${vcases}
+    ${cnotes}
     <hr class="divider">
     <div class="review-lbl">Flag</div>
     <div class="flag-row">${flags}</div>

@@ -25,9 +25,10 @@ Infrastructure_Insight_Matrix_Guide*.html
 /nfl_voice_of_the_fan_research.md
 /Brandskill_arch.md
 
-# All Excel files except the active survey — only WIP_NFL_Survey_v0.xlsx belongs in the repo
+# All Excel files except the active surveys — v0 and v1 both belong in the repo
 *.xlsx
 !working/survey/WIP_NFL_Survey_v0.xlsx
+!working/survey/WIP_NFL_Survey_v1.xlsx
 
 # Personal notes and local overrides
 CLAUDE.local.md
