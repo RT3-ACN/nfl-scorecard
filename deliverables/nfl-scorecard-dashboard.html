@@ -2507,6 +2507,10 @@ const Review = (() => {
     'TS_01': 'Must address concessionaire-managed POS scenario',
   };
 
+  // Namespace comment keys by version to prevent V0/V1 collisions.
+  // V0 keys are bare (e.g. "TI_1"); V1 keys are prefixed (e.g. "v1:TI_1").
+  function vk(qid) { return activeVersion === 'v1' ? 'v1:' + qid : qid; }
+
   function activate() {
     const isV1 = activeVersion === 'v1';
     const cache = isV1 ? questionsV1 : questions;
@@ -2559,8 +2563,8 @@ const Review = (() => {
       if (fLayer !== 'all' && layer !== fLayer) return false;
       if (hasNoteFilter && !q.revision_note?.trim()) return false;
       if (fStatus === 'all') return true;
-      if (fStatus === 'open') return !comments[q.id]?.flag;
-      return comments[q.id]?.flag === fStatus;
+      if (fStatus === 'open') return !comments[vk(q.id)]?.flag;
+      return comments[vk(q.id)]?.flag === fStatus;
     });
     idx = Math.max(0, Math.min(idx, filtered.length - 1));
     updateFilters();
@@ -2582,7 +2586,7 @@ const Review = (() => {
 
   function updateProgress() {
     const activeQ = activeVersion === 'v1' ? questionsV1 : questions;
-    const reviewed = activeQ.filter(q => comments[q.id]?.flag).length;
+    const reviewed = activeQ.filter(q => comments[vk(q.id)]?.flag).length;
     const total = activeQ.length;
     document.getElementById('rprogress-text').textContent = `${reviewed} / ${total} reviewed`;
     document.getElementById('rprogress-fill').style.width = total ? (reviewed/total*100)+'%' : '0%';
@@ -2596,7 +2600,7 @@ const Review = (() => {
 
   function buildCard(q, inline) {
     const layer = q.id.split('_')[0];
-    const c = comments[q.id] || {};
+    const c = comments[vk(q.id)] || {};
     const issue = KNOWN_ISSUES[q.id] || q.known_issue || '';
     const flags = [['✓ OK','ok'],['✎ Revise','revise'],['⊕ Split','split'],['✕ Drop','drop']];
     const flagBtns = flags.map(([lbl,f]) =>
@@ -2691,7 +2695,7 @@ const Review = (() => {
     document.getElementById('rlist-content').style.display = '';
     const container = document.getElementById('rlist-container');
     container.innerHTML = filtered.map(q => {
-      const c = comments[q.id] || {};
+      const c = comments[vk(q.id)] || {};
       const layer = q.id.split('_')[0];
       const chipHtml = c.flag ? `<span class="rflag-chip ${c.flag}" style="background:${flagColor(c.flag)}22;color:${flagColor(c.flag)};border:1px solid ${flagColor(c.flag)}44;border-radius:4px;font-size:9px;font-weight:800;padding:1px 7px;margin-left:8px;">${c.flag.toUpperCase()}</span>` : '';
       const revNoteChip = q.revision_note?.trim() ? (() => {
@@ -2728,9 +2732,10 @@ const Review = (() => {
   }
 
   function clickFlag(qid, flag, btn) {
-    const c = comments[qid] || {};
+    const vkey = vk(qid);
+    const c = comments[vkey] || {};
     const newFlag = c.flag === flag ? '' : flag;
-    comments[qid] = { ...c, flag: newFlag };
+    comments[vkey] = { ...c, flag: newFlag };
     const allBtns = btn.parentElement.querySelectorAll('.rflag-btn');
     allBtns.forEach(b => b.classList.toggle('on', b.dataset.flag === newFlag));
     saveComment(qid);
@@ -2738,16 +2743,17 @@ const Review = (() => {
   }
 
   function saveComment(qid) {
+    const vkey = vk(qid);
     const ta = document.querySelector(`textarea[data-qid="${qid}"]`);
-    const c = comments[qid] || {};
+    const c = comments[vkey] || {};
     const comment = ta ? ta.value : (c.comment || '');
     const flag = c.flag || '';
     if (!flag && !comment) return;
-    comments[qid] = { ...c, comment, flag };
+    comments[vkey] = { ...c, comment, flag };
     fetch(API + '/api/comments', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ id: qid, flag, comment })
+      body: JSON.stringify({ id: vkey, flag, comment })
     }).catch(() => {});
   }
 
@@ -2778,7 +2784,7 @@ const Review = (() => {
     const btn = document.getElementById('rexport-btn');
     btn.textContent = '⏳ Saving…';
     btn.disabled = true;
-    fetch(API + '/api/export', { method: 'POST' })
+    fetch(API + '/api/export' + (activeVersion === 'v1' ? '?v=1' : ''), { method: 'POST' })
       .then(r => r.json())
       .then(d => {
         if (!d.ok) {
@@ -2813,12 +2819,13 @@ const Review = (() => {
   }
 
   function deleteComment(qid) {
-    fetch(API + '/api/comments/' + qid, { method: 'DELETE' })
+    const vkey = vk(qid);
+    fetch(API + '/api/comments/' + encodeURIComponent(vkey), { method: 'DELETE' })
       .then(() => {
-        comments[qid] = { flag: '', comment: '' };
+        comments[vkey] = { flag: '', comment: '' };
         updateProgress();
         if (mode === 'focus') renderFocus(); else renderList();
-        delete comments[qid];
+        delete comments[vkey];
       })
       .catch(() => {});
   }

@@ -14,6 +14,7 @@ import os
 import threading
 import webbrowser
 from pathlib import Path
+from urllib.parse import unquote
 
 PORT           = 9876
 TOOLS_DIR      = Path(__file__).parent
@@ -148,28 +149,48 @@ def save_comment(qid: str, flag: str, comment: str) -> dict:
     return {"ok": True}
 
 
-def export_to_excel() -> dict:
+def export_to_excel(version: str = "v0") -> dict:
     try:
         import openpyxl
     except ImportError:
         return {"ok": False, "msg": "openpyxl not installed — run: pip install openpyxl"}
-    if not SURVEY_XLSX.exists():
-        return {"ok": False, "msg": f"Survey file not found: {SURVEY_XLSX}"}
+    is_v1  = version == "v1"
+    xlsx   = SURVEY_XLSX_V1 if is_v1 else SURVEY_XLSX
+    sheet  = SURVEY_SHEET_V1 if is_v1 else SURVEY_SHEET
+    if not xlsx.exists():
+        return {"ok": False, "msg": f"Survey file not found: {xlsx}"}
     try:
-        today = datetime.date.today().isoformat()
-        data = load_comments()
-        comments = data.get("comments", {})
+        today    = datetime.date.today().isoformat()
+        data     = load_comments()
+        all_cmts = data.get("comments", {})
         reviewer = data.get("meta", {}).get("reviewer", "")
-        wb = openpyxl.load_workbook(str(SURVEY_XLSX))
-        ws = wb[SURVEY_SHEET]
+
+        # Isolate comments for this version only
+        if is_v1:
+            prefix   = "v1:"
+            comments = {k[len(prefix):]: v for k, v in all_cmts.items() if k.startswith(prefix)}
+        else:
+            comments = {k: v for k, v in all_cmts.items() if not k.startswith("v1:")}
+
+        wb = openpyxl.load_workbook(str(xlsx))
+        ws = wb[sheet]
+
+        # Locate Question ID column by header name
+        header_row = [ws.cell(row=1, column=c).value for c in range(1, ws.max_column + 1)]
+        try:
+            qid_col = next(i + 1 for i, h in enumerate(header_row)
+                           if h and str(h).strip() == "Question ID")
+        except StopIteration:
+            qid_col = 3  # fallback
+
         next_col = ws.max_column + 1
-        header = f"Comment - {reviewer} ({today})" if reviewer else f"Comment ({today})"
-        ws.cell(row=1, column=next_col, value=header)
+        col_header = f"Comment - {reviewer} ({today})" if reviewer else f"Comment ({today})"
+        ws.cell(row=1, column=next_col, value=col_header)
         for row in range(2, ws.max_row + 1):
-            qid = ws.cell(row=row, column=3).value
+            qid = ws.cell(row=row, column=qid_col).value
             if not (qid and str(qid).strip() in comments):
                 continue
-            c = comments[str(qid).strip()]
+            c       = comments[str(qid).strip()]
             flag    = c.get("flag", "").strip()
             comment = c.get("comment", "").strip()
             if flag and comment:
@@ -180,8 +201,8 @@ def export_to_excel() -> dict:
                 cell_val = comment
             if cell_val:
                 ws.cell(row=row, column=next_col, value=cell_val)
-        wb.save(str(SURVEY_XLSX))
-        return {"ok": True, "file": SURVEY_XLSX.name, "col": next_col}
+        wb.save(str(xlsx))
+        return {"ok": True, "file": xlsx.name, "col": next_col}
     except Exception as e:
         return {"ok": False, "msg": str(e)}
 
@@ -359,7 +380,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 slug = p[len("/api/meetings/"):]
                 self._json(delete_meeting(slug))
             elif p.startswith("/api/comments/"):
-                qid = p[len("/api/comments/"):]
+                qid = unquote(p[len("/api/comments/"):])
                 self._json(delete_comment(qid))
             else:
                 self._json({"error": "Not found"}, 404)
@@ -379,7 +400,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 self._json({"error": str(e)}, 500)
         elif p == "/api/export":
-            self._json(export_to_excel())
+            qs  = self.path.split("?")[1] if "?" in self.path else ""
+            ver = "v1" if "v=1" in qs else "v0"
+            self._json(export_to_excel(ver))
         elif p == "/api/comments/reset":
             self._json(reset_comments())
         elif p == "/api/reviewer":

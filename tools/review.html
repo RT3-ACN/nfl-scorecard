@@ -490,7 +490,7 @@ function applyFilter() {
   filtered = questions.filter(q => {
     const layer = q.id.split('_')[0].toLowerCase();
     if (fLayer !== 'all' && layer !== fLayer) return false;
-    const c = comments[q.id];
+    const c = comments[vk(q.id)];
     const hasReview = !!(c && (c.flag || c.comment));
     const flag = c?.flag || '';
     if (fStatus === 'unreviewed' && hasReview) return false;
@@ -519,7 +519,7 @@ function renderFocus() {
   const card = document.getElementById('focus-card');
   if (!filtered.length) { card.innerHTML = '<div class="empty">No questions match this filter.</div>'; updateNavBtns(); return; }
   const q = filtered[idx];
-  const c = comments[q.id] || {};
+  const c = comments[vk(q.id)] || {};
   card.innerHTML = buildCardHTML(q, c, true);
   updateNavBtns();
   // Scroll to top of card on navigation
@@ -622,7 +622,7 @@ function renderList() {
   const container = document.getElementById('list-container');
   if (!filtered.length) { container.innerHTML = '<div class="empty">No questions match this filter.</div>'; return; }
   container.innerHTML = filtered.map(q => {
-    const c     = comments[q.id] || {};
+    const c     = comments[vk(q.id)] || {};
     const layer = q.id.split('_')[0];
     const flag  = c.flag || 'none';
     const preview = q.question.length > 90 ? q.question.slice(0, 90) + '…' : q.question;
@@ -653,33 +653,35 @@ function toggleCard(qid) {
 
 // ── FLAG ──────────────────────────────────────────────────────────────────────
 function clickFlag(qid, flag, btn) {
-  const row = btn.closest('.flag-row');
+  const row  = btn.closest('.flag-row');
+  const vkey = vk(qid);
   row.querySelectorAll('.flag-btn').forEach(b => b.classList.remove('active'));
-  const wasActive = (comments[qid]?.flag === flag);
-  if (!comments[qid]) comments[qid] = {};
+  const wasActive = (comments[vkey]?.flag === flag);
+  if (!comments[vkey]) comments[vkey] = {};
   if (wasActive) {
-    comments[qid].flag = '';
+    comments[vkey].flag = '';
   } else {
     btn.classList.add('active');
-    comments[qid].flag = flag;
+    comments[vkey].flag = flag;
   }
   saveComment(qid, true);
 }
 
 // ── SAVE ──────────────────────────────────────────────────────────────────────
 async function saveComment(qid, silent = false) {
+  const vkey    = vk(qid);
   const ta      = document.getElementById(`cmt-${qid}`);
-  const comment = ta ? ta.value.trim() : (comments[qid]?.comment || '');
-  const flag    = comments[qid]?.flag || '';
+  const comment = ta ? ta.value.trim() : (comments[vkey]?.comment || '');
+  const flag    = comments[vkey]?.flag || '';
 
-  if (!comments[qid]) comments[qid] = {};
-  comments[qid].comment = comment;
+  if (!comments[vkey]) comments[vkey] = {};
+  comments[vkey].comment = comment;
 
   try {
     const r = await fetch(`${API}/api/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: qid, flag, comment }),
+      body: JSON.stringify({ id: vkey, flag, comment }),
     });
     if (!r.ok) throw new Error(await r.text());
     if (!silent) toast('Saved ✓', 'ok');
@@ -709,14 +711,15 @@ async function saveAndGo(delta) {
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
 async function deleteComment(qid) {
+  const vkey = vk(qid);
   try {
-    await fetch(`${API}/api/comments/${qid}`, { method: 'DELETE' });
-    comments[qid] = { flag: '', comment: '' };
+    await fetch(`${API}/api/comments/${encodeURIComponent(vkey)}`, { method: 'DELETE' });
+    comments[vkey] = { flag: '', comment: '' };
     toast('Deleted', 'ok');
     updateProgress();
     if (mode === 'focus') renderFocus();
     else renderList();
-    delete comments[qid];
+    delete comments[vkey];
   } catch (e) {
     toast('Delete failed: ' + e.message, 'err');
   }
@@ -740,7 +743,8 @@ async function saveReviewer(name) {
 async function exportToExcel() {
   toast('Exporting…');
   try {
-    const r    = await fetch(`${API}/api/export`, { method: 'POST' });
+    const url  = activeVersion === 'v1' ? `${API}/api/export?v=1` : `${API}/api/export`;
+    const r    = await fetch(url, { method: 'POST' });
     const data = await r.json();
     if (data.ok) toast(`Saved → ${data.file.split('/').slice(-1)[0]} (col ${data.col})`, 'ok');
     else toast('Export failed: ' + data.msg, 'err');
@@ -751,7 +755,7 @@ async function exportToExcel() {
 
 // ── PROGRESS ──────────────────────────────────────────────────────────────────
 function updateProgress() {
-  const reviewed = questions.filter(q => { const c = comments[q.id]; return c && (c.flag || c.comment); }).length;
+  const reviewed = questions.filter(q => { const c = comments[vk(q.id)]; return c && (c.flag || c.comment); }).length;
   const total    = questions.length;
   document.getElementById('progress-text').textContent = `${reviewed} / ${total} reviewed`;
   document.getElementById('progress-fill').style.width = total ? `${(reviewed/total)*100}%` : '0%';
@@ -776,6 +780,11 @@ document.addEventListener('keydown', e => {
 });
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
+// Returns the storage key for a question, namespaced by active version.
+// V0 keys are bare (e.g. "TI_1"); V1 keys are prefixed (e.g. "v1:TI_1").
+// This prevents collisions when V0 and V1 share the same question IDs.
+function vk(qid) { return activeVersion === 'v1' ? 'v1:' + qid : qid; }
+
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
