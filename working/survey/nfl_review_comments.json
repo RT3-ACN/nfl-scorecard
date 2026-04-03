@@ -2,9 +2,10 @@
   "meta": {
     "source": "WIP_NFL_Survey_v0.xlsx",
     "created": "2026-03-27",
-    "last_updated": "2026-03-31",
+    "last_updated": "2026-04-02",
     "export_count": 3,
-    "last_reset": "2026-03-31"
+    "last_reset": "2026-04-02",
+    "reviewer": "Team - RT3, Kieran, Vik"
   },
   "comments": {
     "AI_01": {
@@ -15,32 +16,32 @@
     "TI_1": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_2": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_3": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_4": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T11:57:12"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_5": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_6": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_7": {
       "flag": "",
@@ -60,7 +61,7 @@
     "TI_9": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "TI_10": {
       "flag": "",
@@ -80,22 +81,22 @@
     "TI_14": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "DI_1": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "DI_2": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T12:20:45"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "DI_3": {
       "flag": "",
       "comment": "",
-      "timestamp": "2026-03-31T11:57:12"
+      "timestamp": "2026-04-02T16:03:13"
     },
     "DI_4": {
       "flag": "",
@@ -256,6 +257,76 @@
       "flag": "",
       "comment": "",
       "timestamp": "2026-03-31T11:57:12"
+    },
+    "TI_8b": {
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "TI_15": {
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "TI_8a": {
+      "flag": "",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_1": {
+      "flag": "ok",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_2": {
+      "flag": "ok",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_3": {
+      "flag": "revise",
+      "comment": "Come back to - may be too specific of a question, play with wording",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_4": {
+      "flag": "revise",
+      "comment": "Change wording \"activiely\" - don't include CBRS",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_5": {
+      "flag": "revise",
+      "comment": "We need better phrasing of the questions. - we need to ask the question in a better fashion, should be just about the level of capabilities. - we need to make sure that their are no overlapping questions",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_6": {
+      "flag": "ok",
+      "comment": "",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_9": {
+      "flag": "revise",
+      "comment": "The real question is how much control you have over network ops - then lay out control levers (what cabilities do t they have with their current structure)",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:TI_14": {
+      "flag": "revise",
+      "comment": "Tighten question phrasing",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:DI_1": {
+      "flag": "revise",
+      "comment": "Describe your",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:DI_2": {
+      "flag": "revise",
+      "comment": "We shoudl be asking more describe how they utilize edge compute - make the assumption that they have it",
+      "timestamp": "2026-04-02T16:03:13"
+    },
+    "v1:DI_3": {
+      "flag": "revise",
+      "comment": "rethink/rephrase question - how do they secure and store data (do they have on-prem data center) can we sqeeze into the data infra question.",
+      "timestamp": "2026-04-02T16:03:13"
     }
   }
 }
