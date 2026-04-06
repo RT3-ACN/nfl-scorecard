@@ -37,6 +37,52 @@ KNOWN_ISSUES = {
     "TS_3": "Must address concessionaire-managed POS scenario",
 }
 
+REQUIREMENT_LABELS = {
+    "ts-ticketing":   "Ticketing & access management platform",
+    "ts-pos":         "POS software platform",
+    "ts-mobile-fb":   "Mobile food & beverage ordering platform",
+    "ts-ecomm":       "E-commerce / merchandise platform",
+    "ts-fan-app":     "Fan-facing mobile app platform",
+    "ts-wayfinding":  "Wayfinding & indoor navigation platform",
+    "ts-push":        "Push notification & messaging platform",
+    "ts-signage-cms": "Digital signage content management system",
+    "ts-ops-cmd":     "Venue operations / command center platform",
+    "ts-incident":    "Incident management & security dispatch platform",
+    "ts-workforce":   "Workforce management & game-day staffing platform",
+    "ts-parking":     "Parking & traffic management platform",
+    "ts-egress":      "Egress coordination & crowd flow platform",
+    "ts-sponsorship": "Sponsorship activation & in-venue ad serving platform",
+    "ts-broadcast":   "Broadcasting platform (user layer — TBD)",
+    "di-api-gw":        "Integration middleware / API gateway",
+    "di-streaming":     "Real-time event streaming platform",
+    "di-dw":            "Data warehouse / data lake",
+    "di-cdp":           "Customer data platform (CDP) / fan identity layer",
+    "di-cloud":         "Cloud hosting environment (AWS, Azure, GCP)",
+    "di-edge-orch":     "Cloud-to-edge orchestration",
+    "di-cms-cdn":       "Content management / delivery system (CMS/CDN)",
+    "di-push-infra":    "Push notification infrastructure",
+    "di-ips":           "Indoor positioning engine (BLE/UWB)",
+    "di-sensor-agg":    "Real-time sensor data aggregation platform",
+    "di-iam":           "Identity and access management (IAM / SSO)",
+    "di-siem":          "Cybersecurity platform (SIEM / incident response)",
+    "di-analytics":     "Business Insight / analytics platform",
+    "di-observability": "System observability and monitoring platform",
+    "di-broadcast":     "Broadcasting platform (middle layer — TBD)",
+    "ti-wifi":         "Wi-Fi access points (high-density, Wi-Fi 6/6E)",
+    "ti-das":          "Distributed Antenna System (DAS) / small cells",
+    "ti-fiber":        "Fiber backbone and structured cabling",
+    "ti-switching":    "Core network switching with QoS enforcement",
+    "ti-uplinks":      "Redundant uplinks and failover circuits",
+    "ti-signage-hw":   "Digital signage and LED display systems",
+    "ti-cameras":      "IP camera infrastructure",
+    "ti-beacons":      "Bluetooth / UWB beacons",
+    "ti-iot":          "IoT sensors (occupancy, queue, environmental)",
+    "ti-gates":        "Gate and turnstile scanning hardware",
+    "ti-edge-nodes":   "Edge compute nodes",
+    "ti-datacenter":   "Data center / server infrastructure",
+    "ti-broadcast":    "Broadcasting platform (foundational layer — TBD)",
+}
+
 MIME = {
     ".html": "text/html; charset=utf-8",
     ".js":   "application/javascript",
@@ -137,12 +183,13 @@ def load_comments() -> dict:
         return {"comments": {}}
 
 
-def save_comment(qid: str, flag: str, comment: str) -> dict:
+def save_comment(qid: str, flag: str, comment: str, requirements: list = None) -> dict:
     data = load_comments()
     data.setdefault("comments", {})[qid] = {
-        "flag":      flag,
-        "comment":   comment,
-        "timestamp": datetime.datetime.now().isoformat()[:19],
+        "flag":         flag,
+        "comment":      comment,
+        "requirements": requirements if requirements is not None else [],
+        "timestamp":    datetime.datetime.now().isoformat()[:19],
     }
     data.setdefault("meta", {})["last_updated"] = datetime.date.today().isoformat()
     COMMENTS_FILE.write_text(json.dumps(data, indent=2))
@@ -190,15 +237,20 @@ def export_to_excel(version: str = "v0") -> dict:
             qid = ws.cell(row=row, column=qid_col).value
             if not (qid and str(qid).strip() in comments):
                 continue
-            c       = comments[str(qid).strip()]
-            flag    = c.get("flag", "").strip()
-            comment = c.get("comment", "").strip()
+            c        = comments[str(qid).strip()]
+            flag     = c.get("flag", "").strip()
+            comment  = c.get("comment", "").strip()
+            reqs      = c.get("requirements", [])
+            req_labels = [REQUIREMENT_LABELS.get(r, r) for r in reqs]
+            reqs_str  = " | Requirements: " + "; ".join(req_labels) if req_labels else ""
             if flag and comment:
-                cell_val = f"[{flag.upper()}] {comment}"
+                cell_val = f"[{flag.upper()}] {comment}{reqs_str}"
             elif flag:
-                cell_val = f"[{flag.upper()}]"
+                cell_val = f"[{flag.upper()}]{reqs_str}"
+            elif comment:
+                cell_val = f"{comment}{reqs_str}"
             else:
-                cell_val = comment
+                cell_val = reqs_str.lstrip(" | ")
             if cell_val:
                 ws.cell(row=row, column=next_col, value=cell_val)
         wb.save(str(xlsx))
@@ -229,11 +281,12 @@ def reset_comments() -> dict:
     data = load_comments()
     cleared = 0
     for qid, c in data.get("comments", {}).items():
-        if c.get("flag") or c.get("comment", "").strip():
+        if c.get("flag") or c.get("comment", "").strip() or c.get("requirements"):
             data["comments"][qid] = {
-                "flag":      "",
-                "comment":   "",
-                "timestamp": datetime.datetime.now().isoformat()[:19],
+                "flag":         "",
+                "comment":      "",
+                "requirements": [],
+                "timestamp":    datetime.datetime.now().isoformat()[:19],
             }
             cleared += 1
     data.setdefault("meta", {})["last_reset"] = datetime.date.today().isoformat()
@@ -396,7 +449,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if p == "/api/comments":
             try:
                 d = json.loads(body)
-                self._json(save_comment(d.get("id",""), d.get("flag",""), d.get("comment","")))
+                self._json(save_comment(d.get("id",""), d.get("flag",""), d.get("comment",""), d.get("requirements", [])))
             except Exception as e:
                 self._json({"error": str(e)}, 500)
         elif p == "/api/export":

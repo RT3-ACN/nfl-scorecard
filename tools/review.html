@@ -299,6 +299,57 @@ body {
 .btn-nav:disabled { opacity: 0.3; cursor: default; }
 .nav-counter { font-size: 12px; color: var(--muted); margin: 0 2px; }
 .kbd-hint { font-size: 10px; color: var(--muted2); margin-left: auto; }
+
+/* ── REQUIREMENTS WIDGET ────────────────────────────────── */
+.req-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+.req-trigger {
+  width: 100%; min-height: 36px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px;
+  font-size: 12px; color: var(--muted); font-family: inherit;
+  cursor: pointer; text-align: left;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
+  transition: border-color 0.15s;
+}
+.req-trigger:hover, .req-trigger:focus { outline: none; border-color: var(--purple); }
+.req-chip {
+  background: rgba(161,0,255,.15); border: 1px solid rgba(161,0,255,.35);
+  color: var(--purple); padding: 1px 7px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; white-space: nowrap;
+}
+.req-panel {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  z-index: 200; max-height: 320px; overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.req-group-lbl {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted2);
+  padding: 8px 0 4px; margin-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.req-group-lbl:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+.req-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 4px 4px; font-size: 12px; color: var(--text);
+  cursor: pointer; border-radius: 4px; line-height: 1.4;
+}
+.req-item:hover { background: rgba(255,255,255,.04); }
+.req-item input[type=checkbox] {
+  width: 13px; height: 13px; margin-top: 2px;
+  accent-color: var(--purple); cursor: pointer; flex: 0 0 13px;
+}
+.req-count-badge {
+  background: rgba(161,0,255,.15); color: var(--purple);
+  padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; flex: 0 0 auto;
+}
+.req-none { font-size: 11px; color: var(--muted2); font-style: italic; padding: 4px 2px; }
 kbd {
   background: var(--card2); border: 1px solid var(--border);
   border-radius: 3px; padding: 1px 4px; font-size: 9px; font-family: monospace;
@@ -434,15 +485,70 @@ kbd {
 <script>
 const API = '';
 
+// ── REQUIREMENTS BY LAYER ─────────────────────────────────────────────────────
+const REQUIREMENTS_BY_LAYER = {
+  TS: [
+    { group: "Fan Transaction Platforms",      id: "ts-ticketing",   label: "Ticketing & access management platform" },
+    { group: "Fan Transaction Platforms",      id: "ts-pos",         label: "POS software platform" },
+    { group: "Fan Transaction Platforms",      id: "ts-mobile-fb",   label: "Mobile food & beverage ordering platform" },
+    { group: "Fan Transaction Platforms",      id: "ts-ecomm",       label: "E-commerce / merchandise platform" },
+    { group: "Fan-Facing Experience Platforms",id: "ts-fan-app",     label: "Fan-facing mobile app platform" },
+    { group: "Fan-Facing Experience Platforms",id: "ts-wayfinding",  label: "Wayfinding & indoor navigation platform" },
+    { group: "Fan-Facing Experience Platforms",id: "ts-push",        label: "Push notification & messaging platform" },
+    { group: "Venue Display & Content",        id: "ts-signage-cms", label: "Digital signage content management system" },
+    { group: "Venue Operations Platforms",     id: "ts-ops-cmd",     label: "Venue operations / command center platform" },
+    { group: "Venue Operations Platforms",     id: "ts-incident",    label: "Incident management & security dispatch platform" },
+    { group: "Venue Operations Platforms",     id: "ts-workforce",   label: "Workforce management & game-day staffing platform" },
+    { group: "Venue Operations Platforms",     id: "ts-parking",     label: "Parking & traffic management platform" },
+    { group: "Venue Operations Platforms",     id: "ts-egress",      label: "Egress coordination & crowd flow platform" },
+    { group: "Commercial",                     id: "ts-sponsorship", label: "Sponsorship activation & in-venue ad serving platform" },
+    { group: "Broadcasting",                   id: "ts-broadcast",   label: "Broadcasting platform (user layer — TBD)" },
+  ],
+  DI: [
+    { group: "Data & Integration Layer",       id: "di-api-gw",       label: "Integration middleware / API gateway" },
+    { group: "Data & Integration Layer",       id: "di-streaming",    label: "Real-time event streaming platform" },
+    { group: "Data & Integration Layer",       id: "di-dw",           label: "Data warehouse / data lake" },
+    { group: "Data & Integration Layer",       id: "di-cdp",          label: "Customer data platform (CDP) / fan identity layer" },
+    { group: "Cloud & Compute Platforms",      id: "di-cloud",        label: "Cloud hosting environment (AWS, Azure, GCP)" },
+    { group: "Cloud & Compute Platforms",      id: "di-edge-orch",    label: "Cloud-to-edge orchestration" },
+    { group: "Content & Delivery",             id: "di-cms-cdn",      label: "Content management / delivery system (CMS/CDN)" },
+    { group: "Content & Delivery",             id: "di-push-infra",   label: "Push notification infrastructure" },
+    { group: "Positioning & Sensing Platforms",id: "di-ips",          label: "Indoor positioning engine (BLE/UWB)" },
+    { group: "Positioning & Sensing Platforms",id: "di-sensor-agg",   label: "Real-time sensor data aggregation platform" },
+    { group: "Security & Governance",          id: "di-iam",          label: "Identity and access management (IAM / SSO)" },
+    { group: "Security & Governance",          id: "di-siem",         label: "Cybersecurity platform (SIEM / incident response)" },
+    { group: "Analytics & Observability",      id: "di-analytics",    label: "Business Insight / analytics platform" },
+    { group: "Analytics & Observability",      id: "di-observability",label: "System observability and monitoring platform" },
+    { group: "Broadcasting",                   id: "di-broadcast",    label: "Broadcasting platform (middle layer — TBD)" },
+  ],
+  TI: [
+    { group: "Network & Connectivity Hardware",id: "ti-wifi",         label: "Wi-Fi access points (high-density, Wi-Fi 6/6E)" },
+    { group: "Network & Connectivity Hardware",id: "ti-das",          label: "Distributed Antenna System (DAS) / small cells" },
+    { group: "Network & Connectivity Hardware",id: "ti-fiber",        label: "Fiber backbone and structured cabling" },
+    { group: "Network & Connectivity Hardware",id: "ti-switching",    label: "Core network switching with QoS enforcement" },
+    { group: "Network & Connectivity Hardware",id: "ti-uplinks",      label: "Redundant uplinks and failover circuits" },
+    { group: "Endpoint Hardware — Display",    id: "ti-signage-hw",   label: "Digital signage and LED display systems" },
+    { group: "Endpoint Hardware — Sensing",    id: "ti-cameras",      label: "IP camera infrastructure" },
+    { group: "Endpoint Hardware — Sensing",    id: "ti-beacons",      label: "Bluetooth / UWB beacons" },
+    { group: "Endpoint Hardware — Sensing",    id: "ti-iot",          label: "IoT sensors (occupancy, queue, environmental)" },
+    { group: "Entry Hardware",                 id: "ti-gates",        label: "Gate and turnstile scanning hardware" },
+    { group: "Compute & Data",                 id: "ti-edge-nodes",   label: "Edge compute nodes" },
+    { group: "Compute & Data",                 id: "ti-datacenter",   label: "Data center / server infrastructure" },
+    { group: "Broadcasting",                   id: "ti-broadcast",    label: "Broadcasting platform (foundational layer — TBD)" },
+  ],
+  AI: [],
+};
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let questions      = [];
-let comments       = {};     // { qid: { flag, comment, timestamp } }
+let comments       = {};     // { qid: { flag, comment, requirements, timestamp } }
 let filtered       = [];
 let idx            = 0;      // current index in filtered[] (focus mode)
 let mode           = 'focus';
 let fLayer         = 'all';
 let fStatus        = 'all';
 let activeVersion  = 'v0';
+let _reqPanelOpen  = null;   // qid of currently open requirements dropdown
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 async function init() {
@@ -516,6 +622,7 @@ function setMode(m) {
 
 // ── FOCUS MODE ────────────────────────────────────────────────────────────────
 function renderFocus() {
+  _reqPanelOpen = null;
   const card = document.getElementById('focus-card');
   if (!filtered.length) { card.innerHTML = '<div class="empty">No questions match this filter.</div>'; updateNavBtns(); return; }
   const q = filtered[idx];
@@ -527,9 +634,10 @@ function renderFocus() {
 }
 
 function buildCardHTML(q, c, isFocus) {
-  const layer    = q.id.split('_')[0];
-  const flag     = c.flag || '';
-  const comment  = c.comment || '';
+  const layer        = q.id.split('_')[0];
+  const flag         = c.flag || '';
+  const comment      = c.comment || '';
+  const requirements = c.requirements || [];
   const options  = (q.options || []).filter(Boolean);
 
   const badge    = `<span class="layer-badge badge-${layer}">${layer}</span>`;
@@ -598,6 +706,8 @@ function buildCardHTML(q, c, isFocus) {
     <hr class="divider">
     <div class="review-lbl">Flag</div>
     <div class="flag-row">${flags}</div>
+    <div class="review-lbl">Requirements Covered</div>
+    ${buildReqWidget(q.id, layer, requirements)}
     <div class="review-lbl">Comment</div>
     <textarea class="comment-box" id="cmt-${q.id}" placeholder="Notes, concerns, rewrites, questions…">${esc(comment)}</textarea>
     <div class="action-row">
@@ -628,6 +738,8 @@ function renderList() {
     const preview = q.question.length > 90 ? q.question.slice(0, 90) + '…' : q.question;
     const issueDot = q.known_issue ? '<span class="issue-dot" title="Known issue"></span>' : '';
     const flagLabel = c.flag ? c.flag.toUpperCase() : '—';
+    const reqCount = (c.requirements || []).length;
+    const reqBadge = reqCount ? `<span class="req-count-badge" title="${reqCount} requirement${reqCount>1?'s':''} tagged">${reqCount} req${reqCount>1?'s':''}</span>` : '';
     return `
       <div class="list-card" id="lc-${q.id}">
         <div class="list-header" onclick="toggleCard('${q.id}')">
@@ -636,6 +748,7 @@ function renderList() {
           ${issueDot}
           <span class="list-domain">${esc(q.domain)}</span>
           <span class="list-q-preview">${esc(preview)}</span>
+          ${reqBadge}
           <span class="flag-chip ${flag}">${flagLabel}</span>
           <span class="expand-caret">▾</span>
         </div>
@@ -669,10 +782,11 @@ function clickFlag(qid, flag, btn) {
 
 // ── SAVE ──────────────────────────────────────────────────────────────────────
 async function saveComment(qid, silent = false) {
-  const vkey    = vk(qid);
-  const ta      = document.getElementById(`cmt-${qid}`);
-  const comment = ta ? ta.value.trim() : (comments[vkey]?.comment || '');
-  const flag    = comments[vkey]?.flag || '';
+  const vkey        = vk(qid);
+  const ta          = document.getElementById(`cmt-${qid}`);
+  const comment     = ta ? ta.value.trim() : (comments[vkey]?.comment || '');
+  const flag        = comments[vkey]?.flag || '';
+  const requirements= comments[vkey]?.requirements || [];
 
   if (!comments[vkey]) comments[vkey] = {};
   comments[vkey].comment = comment;
@@ -681,7 +795,7 @@ async function saveComment(qid, silent = false) {
     const r = await fetch(`${API}/api/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: vkey, flag, comment }),
+      body: JSON.stringify({ id: vkey, flag, comment, requirements }),
     });
     if (!r.ok) throw new Error(await r.text());
     if (!silent) toast('Saved ✓', 'ok');
@@ -714,7 +828,7 @@ async function deleteComment(qid) {
   const vkey = vk(qid);
   try {
     await fetch(`${API}/api/comments/${encodeURIComponent(vkey)}`, { method: 'DELETE' });
-    comments[vkey] = { flag: '', comment: '' };
+    comments[vkey] = { flag: '', comment: '', requirements: [] };
     toast('Deleted', 'ok');
     updateProgress();
     if (mode === 'focus') renderFocus();
@@ -776,6 +890,101 @@ document.addEventListener('keydown', e => {
     const q = filtered[idx]; if (!q) return;
     const btn = document.querySelector(`#focus-card .flag-btn.${flagMap[e.key]}`);
     if (btn) clickFlag(q.id, flagMap[e.key], btn);
+  }
+});
+
+// ── REQUIREMENTS WIDGET ───────────────────────────────────────────────────────
+function buildReqWidget(qid, layer, selectedReqs) {
+  const reqs = REQUIREMENTS_BY_LAYER[layer] || [];
+  if (!reqs.length) {
+    return `<div class="req-wrap"><div class="req-none">No requirements defined for ${esc(layer)} layer yet.</div></div>`;
+  }
+  const sel = selectedReqs || [];
+
+  // Group by sub-category
+  const groups = {};
+  reqs.forEach(r => { (groups[r.group] = groups[r.group] || []).push(r); });
+
+  const triggerInner = sel.length
+    ? sel.map(id => {
+        const r = reqs.find(x => x.id === id);
+        return r ? `<span class="req-chip">${esc(r.label)}</span>` : '';
+      }).join('') + `<span style="margin-left:auto;font-size:10px;color:var(--muted);flex:0 0 auto">${sel.length} selected ▾</span>`
+    : `<span style="color:var(--muted2);flex:1">Select requirements covered by this question…</span><span style="font-size:10px;color:var(--muted);flex:0 0 auto">▾</span>`;
+
+  const panelItems = Object.entries(groups).map(([group, items], gi) => `
+    <div class="req-group-lbl" ${gi===0?'style="padding-top:2px"':''}>${esc(group)}</div>
+    ${items.map(r => `
+      <label class="req-item">
+        <input type="checkbox" onchange="toggleReq('${qid}','${r.id}',this)" ${sel.includes(r.id) ? 'checked' : ''}>
+        ${esc(r.label)}
+      </label>`).join('')}
+  `).join('');
+
+  return `
+    <div class="req-wrap" id="req-wrap-${qid}">
+      <button class="req-trigger" id="req-trigger-${qid}" onclick="toggleReqPanel('${qid}',event)" type="button">
+        ${triggerInner}
+      </button>
+      <div class="req-panel" id="req-panel-${qid}" style="display:none">
+        ${panelItems}
+      </div>
+    </div>`;
+}
+
+function toggleReqPanel(qid, evt) {
+  evt.stopPropagation();
+  const panel = document.getElementById(`req-panel-${qid}`);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  // Close any other open panel
+  if (_reqPanelOpen && _reqPanelOpen !== qid) {
+    const prev = document.getElementById(`req-panel-${_reqPanelOpen}`);
+    if (prev) prev.style.display = 'none';
+  }
+  panel.style.display = isOpen ? 'none' : 'block';
+  _reqPanelOpen = isOpen ? null : qid;
+}
+
+function toggleReq(qid, reqId, checkbox) {
+  const vkey = vk(qid);
+  if (!comments[vkey]) comments[vkey] = {};
+  const reqs = [...(comments[vkey].requirements || [])];
+  if (checkbox.checked) {
+    if (!reqs.includes(reqId)) reqs.push(reqId);
+  } else {
+    const i = reqs.indexOf(reqId);
+    if (i !== -1) reqs.splice(i, 1);
+  }
+  comments[vkey].requirements = reqs;
+  refreshReqTrigger(qid);
+  saveComment(qid, true);
+}
+
+function refreshReqTrigger(qid) {
+  const trigger = document.getElementById(`req-trigger-${qid}`);
+  if (!trigger) return;
+  const vkey = vk(qid);
+  const layer = qid.split('_')[0];
+  const reqs  = REQUIREMENTS_BY_LAYER[layer] || [];
+  const sel   = comments[vkey]?.requirements || [];
+  const inner = sel.length
+    ? sel.map(id => {
+        const r = reqs.find(x => x.id === id);
+        return r ? `<span class="req-chip">${esc(r.label)}</span>` : '';
+      }).join('') + `<span style="margin-left:auto;font-size:10px;color:var(--muted);flex:0 0 auto">${sel.length} selected ▾</span>`
+    : `<span style="color:var(--muted2);flex:1">Select requirements covered by this question…</span><span style="font-size:10px;color:var(--muted);flex:0 0 auto">▾</span>`;
+  trigger.innerHTML = inner;
+}
+
+// Close req panel when clicking outside
+document.addEventListener('click', e => {
+  if (!_reqPanelOpen) return;
+  const wrap = document.getElementById(`req-wrap-${_reqPanelOpen}`);
+  if (wrap && !wrap.contains(e.target)) {
+    const panel = document.getElementById(`req-panel-${_reqPanelOpen}`);
+    if (panel) panel.style.display = 'none';
+    _reqPanelOpen = null;
   }
 });
 

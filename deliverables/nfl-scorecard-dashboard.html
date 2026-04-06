@@ -533,6 +533,19 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
 .rcnotes-txt { font-size:11px; color:var(--text2); line-height:1.5; font-family:'SF Mono',Consolas,monospace; }
 .rflag-chip.none   { background: var(--surface3);  color: var(--muted);  }
 .rissuedot { width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; flex: 0 0 5px; }
+/* ── Requirements widget ── */
+.rreq-wrap { position:relative; margin-bottom:14px; }
+.rreq-trigger { width:100%; min-height:34px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:5px 10px; font-size:12px; color:var(--muted); font-family:inherit; cursor:pointer; text-align:left; display:flex; align-items:center; flex-wrap:wrap; gap:5px; transition:border-color 0.12s; }
+.rreq-trigger:hover, .rreq-trigger:focus { outline:none; border-color:var(--purple); }
+.rreq-chip { background:rgba(161,0,255,.15); border:1px solid rgba(161,0,255,.35); color:#c77dff; padding:1px 7px; border-radius:4px; font-size:10px; font-weight:600; white-space:nowrap; }
+.rreq-panel { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 14px; z-index:200; max-height:300px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+.rreq-group-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding:8px 0 4px; margin-top:4px; border-top:1px solid var(--border); }
+.rreq-group-lbl:first-child { border-top:none; margin-top:0; padding-top:0; }
+.rreq-item { display:flex; align-items:flex-start; gap:8px; padding:3px 4px; font-size:12px; color:var(--text); cursor:pointer; border-radius:4px; line-height:1.4; }
+.rreq-item:hover { background:rgba(255,255,255,.04); }
+.rreq-item input[type=checkbox] { width:13px; height:13px; margin-top:2px; accent-color:#a100ff; cursor:pointer; flex:0 0 13px; }
+.rreq-count { background:rgba(161,0,255,.15); color:#c77dff; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:700; flex:0 0 auto; }
+.rreq-none { font-size:11px; color:var(--muted); font-style:italic; padding:4px 2px; }
 .rcaret { font-size: 9px; color: var(--muted); transition: transform 0.18s; flex: 0 0 auto; }
 .rlist-card.open .rcaret { transform: rotate(180deg); }
 .rlist-body { display: none; border-top: 1px solid var(--border); padding: 16px; }
@@ -652,7 +665,7 @@ mark { background: rgba(99,102,241,0.25); color: var(--blue); border-radius: 2px
           var cur = (d && d.value) ? d.value : {comments: {}, meta: {}};
           if (!cur.comments) cur.comments = {};
           if (!cur.meta) cur.meta = {};
-          if (body.id) cur.comments[body.id] = {comment: body.comment || '', flag: body.flag || ''};
+          if (body.id) cur.comments[body.id] = {comment: body.comment || '', flag: body.flag || '', requirements: body.requirements || []};
           if (body.reviewer !== undefined) cur.meta.reviewer = body.reviewer;
           return _origFetch(NL + '/kv/comments', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -2502,9 +2515,63 @@ const Review = (() => {
   let questions = [], comments = {}, history = [], filtered = [], idx = 0;
   let mode = 'focus', fLayer = 'all', fStatus = 'all', hasNoteFilter = false;
   let activeVersion = 'v0', questionsV1 = [];
+  let _reqPanelOpen = null;
 
   const KNOWN_ISSUES = {
     'TS_01': 'Must address concessionaire-managed POS scenario',
+  };
+
+  const REQUIREMENTS_BY_LAYER = {
+    TS: [
+      { group:'Fan Transaction Platforms',       id:'ts-ticketing',   label:'Ticketing & access management platform' },
+      { group:'Fan Transaction Platforms',       id:'ts-pos',         label:'POS software platform' },
+      { group:'Fan Transaction Platforms',       id:'ts-mobile-fb',   label:'Mobile food & beverage ordering platform' },
+      { group:'Fan Transaction Platforms',       id:'ts-ecomm',       label:'E-commerce / merchandise platform' },
+      { group:'Fan-Facing Experience Platforms', id:'ts-fan-app',     label:'Fan-facing mobile app platform' },
+      { group:'Fan-Facing Experience Platforms', id:'ts-wayfinding',  label:'Wayfinding & indoor navigation platform' },
+      { group:'Fan-Facing Experience Platforms', id:'ts-push',        label:'Push notification & messaging platform' },
+      { group:'Venue Display & Content',         id:'ts-signage-cms', label:'Digital signage content management system' },
+      { group:'Venue Operations Platforms',      id:'ts-ops-cmd',     label:'Venue operations / command center platform' },
+      { group:'Venue Operations Platforms',      id:'ts-incident',    label:'Incident management & security dispatch platform' },
+      { group:'Venue Operations Platforms',      id:'ts-workforce',   label:'Workforce management & game-day staffing platform' },
+      { group:'Venue Operations Platforms',      id:'ts-parking',     label:'Parking & traffic management platform' },
+      { group:'Venue Operations Platforms',      id:'ts-egress',      label:'Egress coordination & crowd flow platform' },
+      { group:'Commercial',                      id:'ts-sponsorship', label:'Sponsorship activation & in-venue ad serving platform' },
+      { group:'Broadcasting',                    id:'ts-broadcast',   label:'Broadcasting platform (user layer — TBD)' },
+    ],
+    DI: [
+      { group:'Data & Integration Layer',        id:'di-api-gw',        label:'Integration middleware / API gateway' },
+      { group:'Data & Integration Layer',        id:'di-streaming',     label:'Real-time event streaming platform' },
+      { group:'Data & Integration Layer',        id:'di-dw',            label:'Data warehouse / data lake' },
+      { group:'Data & Integration Layer',        id:'di-cdp',           label:'Customer data platform (CDP) / fan identity layer' },
+      { group:'Cloud & Compute Platforms',       id:'di-cloud',         label:'Cloud hosting environment (AWS, Azure, GCP)' },
+      { group:'Cloud & Compute Platforms',       id:'di-edge-orch',     label:'Cloud-to-edge orchestration' },
+      { group:'Content & Delivery',              id:'di-cms-cdn',       label:'Content management / delivery system (CMS/CDN)' },
+      { group:'Content & Delivery',              id:'di-push-infra',    label:'Push notification infrastructure' },
+      { group:'Positioning & Sensing Platforms', id:'di-ips',           label:'Indoor positioning engine (BLE/UWB)' },
+      { group:'Positioning & Sensing Platforms', id:'di-sensor-agg',    label:'Real-time sensor data aggregation platform' },
+      { group:'Security & Governance',           id:'di-iam',           label:'Identity and access management (IAM / SSO)' },
+      { group:'Security & Governance',           id:'di-siem',          label:'Cybersecurity platform (SIEM / incident response)' },
+      { group:'Analytics & Observability',       id:'di-analytics',     label:'Business Insight / analytics platform' },
+      { group:'Analytics & Observability',       id:'di-observability', label:'System observability and monitoring platform' },
+      { group:'Broadcasting',                    id:'di-broadcast',     label:'Broadcasting platform (middle layer — TBD)' },
+    ],
+    TI: [
+      { group:'Network & Connectivity Hardware', id:'ti-wifi',         label:'Wi-Fi access points (high-density, Wi-Fi 6/6E)' },
+      { group:'Network & Connectivity Hardware', id:'ti-das',          label:'Distributed Antenna System (DAS) / small cells' },
+      { group:'Network & Connectivity Hardware', id:'ti-fiber',        label:'Fiber backbone and structured cabling' },
+      { group:'Network & Connectivity Hardware', id:'ti-switching',    label:'Core network switching with QoS enforcement' },
+      { group:'Network & Connectivity Hardware', id:'ti-uplinks',      label:'Redundant uplinks and failover circuits' },
+      { group:'Endpoint Hardware — Display',     id:'ti-signage-hw',   label:'Digital signage and LED display systems' },
+      { group:'Endpoint Hardware — Sensing',     id:'ti-cameras',      label:'IP camera infrastructure' },
+      { group:'Endpoint Hardware — Sensing',     id:'ti-beacons',      label:'Bluetooth / UWB beacons' },
+      { group:'Endpoint Hardware — Sensing',     id:'ti-iot',          label:'IoT sensors (occupancy, queue, environmental)' },
+      { group:'Entry Hardware',                  id:'ti-gates',        label:'Gate and turnstile scanning hardware' },
+      { group:'Compute & Data',                  id:'ti-edge-nodes',   label:'Edge compute nodes' },
+      { group:'Compute & Data',                  id:'ti-datacenter',   label:'Data center / server infrastructure' },
+      { group:'Broadcasting',                    id:'ti-broadcast',    label:'Broadcasting platform (foundational layer — TBD)' },
+    ],
+    AI: [],
   };
 
   // Namespace comment keys by version to prevent V0/V1 collisions.
@@ -2598,6 +2665,65 @@ const Review = (() => {
 
   const REV_LABEL = { good: '✓ Colleague: Looks Good', revise: '⚠ Colleague: Needs Revision', drop: '✕ Colleague: Consider Dropping', claude: '→ Task for Claude' };
 
+  function buildReqWidget(qid, layer, sel) {
+    const reqs = REQUIREMENTS_BY_LAYER[layer] || [];
+    if (!reqs.length) return `<div class="rreq-wrap"><div class="rreq-none">No requirements defined for ${layer} layer yet.</div></div>`;
+    const groups = {};
+    reqs.forEach(r => { (groups[r.group] = groups[r.group] || []).push(r); });
+    const trigInner = sel.length
+      ? sel.map(id => { const r=reqs.find(x=>x.id===id); return r?`<span class="rreq-chip">${r.label}</span>`:''; }).join('')
+        + `<span style="margin-left:auto;font-size:10px;color:var(--muted);flex:0 0 auto">${sel.length} selected ▾</span>`
+      : `<span style="color:var(--muted);flex:1">Select requirements covered…</span><span style="font-size:10px;color:var(--muted);flex:0 0 auto">▾</span>`;
+    const panelHtml = Object.entries(groups).map(([g,items],gi) =>
+      `<div class="rreq-group-lbl"${gi===0?' style="padding-top:2px"':''}>${g}</div>`
+      + items.map(r=>`<label class="rreq-item"><input type="checkbox" onchange="Review.toggleReq('${qid}','${r.id}',this)"${sel.includes(r.id)?' checked':''}> ${r.label}</label>`).join('')
+    ).join('');
+    return `<div class="rreq-wrap" id="rreq-wrap-${qid}">
+      <button class="rreq-trigger" id="rreq-trigger-${qid}" onclick="Review.toggleReqPanel('${qid}',event)" type="button">${trigInner}</button>
+      <div class="rreq-panel" id="rreq-panel-${qid}" style="display:none">${panelHtml}</div>
+    </div>`;
+  }
+
+  function toggleReqPanel(qid, evt) {
+    evt.stopPropagation();
+    const panel = document.getElementById('rreq-panel-'+qid);
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    if (_reqPanelOpen && _reqPanelOpen !== qid) {
+      const prev = document.getElementById('rreq-panel-'+_reqPanelOpen);
+      if (prev) {
+        prev.style.display = 'none';
+        const prevCard = prev.closest('.rlist-card');
+        if (prevCard) prevCard.style.overflow = '';
+      }
+    }
+    panel.style.display = isOpen ? 'none' : 'block';
+    _reqPanelOpen = isOpen ? null : qid;
+    // .rlist-card has overflow:hidden for border-radius — lift it while panel is open
+    const listCard = panel.closest('.rlist-card');
+    if (listCard) listCard.style.overflow = isOpen ? '' : 'visible';
+  }
+
+  function toggleReq(qid, reqId, checkbox) {
+    const vkey = vk(qid);
+    if (!comments[vkey]) comments[vkey] = {};
+    const reqs = [...(comments[vkey].requirements || [])];
+    if (checkbox.checked) { if (!reqs.includes(reqId)) reqs.push(reqId); }
+    else { const i=reqs.indexOf(reqId); if (i!==-1) reqs.splice(i,1); }
+    comments[vkey].requirements = reqs;
+    const trigger = document.getElementById('rreq-trigger-'+qid);
+    if (trigger) {
+      const layer = qid.split('_')[0];
+      const allReqs = REQUIREMENTS_BY_LAYER[layer] || [];
+      const inner = reqs.length
+        ? reqs.map(id=>{const r=allReqs.find(x=>x.id===id);return r?`<span class="rreq-chip">${r.label}</span>`:''}).join('')
+          + `<span style="margin-left:auto;font-size:10px;color:var(--muted);flex:0 0 auto">${reqs.length} selected ▾</span>`
+        : `<span style="color:var(--muted);flex:1">Select requirements covered…</span><span style="font-size:10px;color:var(--muted);flex:0 0 auto">▾</span>`;
+      trigger.innerHTML = inner;
+    }
+    saveComment(qid);
+  }
+
   function buildCard(q, inline) {
     const layer = q.id.split('_')[0];
     const c = comments[vk(q.id)] || {};
@@ -2668,6 +2794,8 @@ const Review = (() => {
       ${cnotesBlock}
       <div class="rq-divider"></div>
       <div class="rflag-row">${flagBtns}</div>
+      <div class="rq-slbl" style="margin-bottom:6px">Requirements Covered</div>
+      ${buildReqWidget(q.id, layer, c.requirements || [])}
       <textarea class="rq-comment" data-qid="${q.id}" placeholder="Add comment or concern…">${c.comment||''}</textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button onclick="Review.deleteComment('${q.id}')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Delete</button>
@@ -2676,6 +2804,7 @@ const Review = (() => {
   }
 
   function renderFocus() {
+    _reqPanelOpen = null;
     document.getElementById('rfocus-content').style.display = '';
     document.getElementById('rlist-content').style.display = 'none';
     const card = document.getElementById('rq-card');
@@ -2691,13 +2820,19 @@ const Review = (() => {
   }
 
   function renderList() {
+    _reqPanelOpen = null;
     document.getElementById('rfocus-content').style.display = 'none';
     document.getElementById('rlist-content').style.display = '';
+    // Clear focus card to prevent duplicate element IDs conflicting with list view
+    const fc = document.getElementById('rq-card');
+    if (fc) fc.innerHTML = '';
     const container = document.getElementById('rlist-container');
     container.innerHTML = filtered.map(q => {
       const c = comments[vk(q.id)] || {};
       const layer = q.id.split('_')[0];
       const chipHtml = c.flag ? `<span class="rflag-chip ${c.flag}" style="background:${flagColor(c.flag)}22;color:${flagColor(c.flag)};border:1px solid ${flagColor(c.flag)}44;border-radius:4px;font-size:9px;font-weight:800;padding:1px 7px;margin-left:8px;">${c.flag.toUpperCase()}</span>` : '';
+      const reqCount = (c.requirements || []).length;
+      const reqBadge = reqCount ? `<span class="rreq-count" title="${reqCount} requirement${reqCount>1?'s':''} tagged">${reqCount} req${reqCount>1?'s':''}</span>` : '';
       const revNoteChip = q.revision_note?.trim() ? (() => {
         const t = classifyNote(q.revision_note);
         const icon = {good:'✓',revise:'⚠',drop:'✕',claude:'→'}[t] || '📝';
@@ -2713,6 +2848,7 @@ const Review = (() => {
             ${changeChip}
             <span style="font-size:12px;color:var(--text2);margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.question.slice(0,80)}${q.question.length>80?'…':''}</span>
             ${revNoteChip}
+            ${reqBadge}
             ${chipHtml}
             <span style="margin-left:auto;color:var(--muted);font-size:11px">▼</span>
           </div>
@@ -2748,12 +2884,13 @@ const Review = (() => {
     const c = comments[vkey] || {};
     const comment = ta ? ta.value : (c.comment || '');
     const flag = c.flag || '';
-    if (!flag && !comment) return;
-    comments[vkey] = { ...c, comment, flag };
+    const requirements = c.requirements || [];
+    if (!flag && !comment && !requirements.length) return;
+    comments[vkey] = { ...c, comment, flag, requirements };
     fetch(API + '/api/comments', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ id: vkey, flag, comment })
+      body: JSON.stringify({ id: vkey, flag, comment, requirements })
     }).catch(() => {});
   }
 
@@ -2822,7 +2959,7 @@ const Review = (() => {
     const vkey = vk(qid);
     fetch(API + '/api/comments/' + encodeURIComponent(vkey), { method: 'DELETE' })
       .then(() => {
-        comments[vkey] = { flag: '', comment: '' };
+        comments[vkey] = { flag: '', comment: '', requirements: [] };
         updateProgress();
         if (mode === 'focus') renderFocus(); else renderList();
         delete comments[vkey];
@@ -2841,8 +2978,16 @@ const Review = (() => {
     }).catch(() => {});
   }
 
-  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote, deleteComment, saveReviewer, setVersion };
+  return { activate, setMode, setLayer, setStatus, clickFlag, saveAndGo, toggleListItem, doExport, toggleHasNote, deleteComment, saveReviewer, setVersion, toggleReq, toggleReqPanel };
 })();
+
+// Close requirements panel when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.rreq-wrap')) {
+    document.querySelectorAll('.rreq-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.rlist-card').forEach(c => c.style.overflow = '');
+  }
+});
 
 // ── Meetings module ───────────────────────────────────────────────────────────
 const Meetings = (() => {
